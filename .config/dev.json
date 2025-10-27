@@ -1,0 +1,17 @@
+{
+  "port": 80,
+  "databases": {
+    "postgres": "postgres://postgres:%s@postgres:5432/subscriber_service?sslmode=disable",
+    "kafka": {
+      "brokers": [
+        "kafka:9093"
+      ],
+      "topics": {
+        "inspections": "inspections-topic"
+      }
+    }
+  },
+  "cluster": {
+    "taskService": "http://task-service"
+  }
+}
