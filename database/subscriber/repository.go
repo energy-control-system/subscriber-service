@@ -19,6 +19,12 @@ var (
 	//go:embed sql/add_subscriber.sql
 	addSubscriberSQL string
 
+	//go:embed sql/get_all_passports.sql
+	getAllPassportsSQL string
+
+	//go:embed sql/get_all_subscribers.sql
+	getAllSubscribersSQL string
+
 	//go:embed sql/get_passport_by_subscriber_id.sql
 	getPassportBySubscriberIDSQL string
 
@@ -113,6 +119,56 @@ func (r *Repository) GetSubscriberByID(ctx context.Context, id int) (subscriber.
 	}
 
 	return newSubscriber, err
+}
+
+func (r *Repository) GetAllSubscribers(ctx context.Context) ([]subscriber.Subscriber, error) {
+	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	var dbSubscribers []Subscriber
+	err = tx.SelectContext(ctx, &dbSubscribers, getAllSubscribersSQL)
+	if err != nil {
+		err = fmt.Errorf("get all subscribers: %w", err)
+		return nil, err
+	}
+
+	var dbPassports []Passport
+	err = tx.SelectContext(ctx, &dbPassports, getAllPassportsSQL)
+	if err != nil {
+		err = fmt.Errorf("get all passports: %w", err)
+		return nil, err
+	}
+
+	passportMap := make(map[int]Passport, len(dbPassports))
+	for _, dbPassport := range dbPassports {
+		passportMap[dbPassport.SubscriberID] = dbPassport
+	}
+
+	subscribers := make([]subscriber.Subscriber, 0, len(dbSubscribers))
+	for _, dbSubscriber := range dbSubscribers {
+		dbPassport, ok := passportMap[dbSubscriber.ID]
+		if !ok {
+			err = fmt.Errorf("passport not found for subscriber %d", dbSubscriber.ID)
+			return nil, err
+		}
+
+		subscribers = append(subscribers, MapSubscriberFromDB(dbSubscriber, dbPassport))
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return nil, err
+	}
+
+	return subscribers, err
 }
 
 func (r *Repository) UpdateSubscriberStatus(ctx context.Context, subscriberID int, newStatus subscriber.Status) error {

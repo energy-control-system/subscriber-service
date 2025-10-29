@@ -43,3 +43,14 @@ func GetSubscriberByID(s *subscriber.Service) gorouter.Handler {
 		return c.WriteJson(http.StatusOK, response)
 	}
 }
+
+func GetAllSubscribers(s *subscriber.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		response, err := s.GetAllSubscribers(c.Ctx())
+		if err != nil {
+			return fmt.Errorf("failed to get all subscribers: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}

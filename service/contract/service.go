@@ -39,6 +39,15 @@ func (s *Service) AddContract(ctx goctx.Context, request AddContractRequest) (Co
 	return c, nil
 }
 
+func (s *Service) GetAllContracts(ctx goctx.Context) ([]Contract, error) {
+	contracts, err := s.repository.GetAllContracts(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get all contracts from repository: %w", err)
+	}
+
+	return contracts, nil
+}
+
 func (s *Service) GetLastContractByObjectID(ctx goctx.Context, objectID int) (Contract, error) {
 	c, err := s.repository.GetLastContractByObjectID(ctx, objectID)
 	if err != nil {

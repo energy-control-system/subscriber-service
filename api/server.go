@@ -40,6 +40,7 @@ func (s *ServerBuilder) AddSubscribers(service *subscriber.Service) {
 	r := s.router.SubRouter("/subscribers")
 	r.HandlePost("", handler.AddSubscriber(service))
 	r.HandleGet("/{id}", handler.GetSubscriberByID(service))
+	r.HandleGet("", handler.GetAllSubscribers(service))
 }
 
 func (s *ServerBuilder) AddObjects(service *object.Service) {
@@ -48,11 +49,13 @@ func (s *ServerBuilder) AddObjects(service *object.Service) {
 	r.HandleGet("/{id}", handler.GetObjectByID(service))
 	r.HandleGet("/devices/{deviceID}", handler.GetObjectByDeviceID(service))
 	r.HandleGet("/seals/{sealID}", handler.GetObjectBySealID(service))
+	r.HandleGet("", handler.GetAllObjects(service))
 }
 
 func (s *ServerBuilder) AddContracts(service *contract.Service) {
 	r := s.router.SubRouter("/contracts")
 	r.HandlePost("", handler.AddContract(service))
+	r.HandleGet("", handler.GetAllContracts(service))
 	r.HandleGet("/objects/{objectID}/last", handler.GetLastContractByObjectID(service))
 }
 

@@ -51,3 +51,12 @@ func (s *Service) GetObjectBySealID(ctx goctx.Context, sealID int) (Object, erro
 
 	return obj, nil
 }
+
+func (s *Service) GetAllObjects(ctx goctx.Context) ([]Object, error) {
+	objects, err := s.repository.GetAllObjects(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get all objects from repository: %w", err)
+	}
+
+	return objects, nil
+}

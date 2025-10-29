@@ -33,3 +33,12 @@ func (s *Service) GetSubscriberByID(ctx goctx.Context, id int) (Subscriber, erro
 
 	return subscriber, nil
 }
+
+func (s *Service) GetAllSubscribers(ctx goctx.Context) ([]Subscriber, error) {
+	subscribers, err := s.repository.GetAllSubscribers(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get all subscribers from repository: %w", err)
+	}
+
+	return subscribers, nil
+}

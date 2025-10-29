@@ -22,6 +22,15 @@ var (
 	//go:embed sql/add_seal.sql
 	addSealSQL string
 
+	//go:embed sql/get_all_devices.sql
+	getAllDevicesSQL string
+
+	//go:embed sql/get_all_objects.sql
+	getAllObjectsSQL string
+
+	//go:embed sql/get_all_seals.sql
+	getAllSealsSQL string
+
 	//go:embed sql/get_object_by_device_id.sql
 	getObjectByDeviceIDSQL string
 
@@ -263,4 +272,66 @@ func (r *Repository) GetObjectBySealID(ctx context.Context, sealID int) (object.
 	}
 
 	return obj, err
+}
+
+func (r *Repository) GetAllObjects(ctx context.Context) ([]object.Object, error) {
+	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	var dbObjects []Object
+	err = tx.SelectContext(ctx, &dbObjects, getAllObjectsSQL)
+	if err != nil {
+		err = fmt.Errorf("get all objects: %w", err)
+		return nil, err
+	}
+
+	var dbDevices []Device
+	err = tx.SelectContext(ctx, &dbDevices, getAllDevicesSQL)
+	if err != nil {
+		err = fmt.Errorf("get all devices: %w", err)
+		return nil, err
+	}
+
+	var dbSeals []Seal
+	err = tx.SelectContext(ctx, &dbSeals, getAllSealsSQL)
+	if err != nil {
+		err = fmt.Errorf("get all seals: %w", err)
+		return nil, err
+	}
+
+	deviceMap := make(map[int][]Device, len(dbObjects))
+	for _, device := range dbDevices {
+		deviceMap[device.ObjectID] = append(deviceMap[device.ObjectID], device)
+	}
+
+	objects := make([]object.Object, 0, len(dbObjects))
+	for _, dbObject := range dbObjects {
+		devices, ok := deviceMap[dbObject.ID]
+		if !ok {
+			err = fmt.Errorf("object %d devices not found", dbObject.ID)
+		}
+
+		obj, mapErr := MapObjectFullFromDB(dbObject, devices, dbSeals)
+		if mapErr != nil {
+			mapErr = fmt.Errorf("map object: %w", mapErr)
+			return nil, mapErr
+		}
+
+		objects = append(objects, obj)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return nil, err
+	}
+
+	return objects, err
 }

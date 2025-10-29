@@ -79,3 +79,14 @@ func GetObjectBySealID(s *object.Service) gorouter.Handler {
 		return c.WriteJson(http.StatusOK, response)
 	}
 }
+
+func GetAllObjects(s *object.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		response, err := s.GetAllObjects(c.Ctx())
+		if err != nil {
+			return fmt.Errorf("failed to get all objects: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}

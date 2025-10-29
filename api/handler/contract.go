@@ -24,6 +24,17 @@ func AddContract(s *contract.Service) gorouter.Handler {
 	}
 }
 
+func GetAllContracts(s *contract.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		response, err := s.GetAllContracts(c.Ctx())
+		if err != nil {
+			return fmt.Errorf("failed to get all contracts: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}
+
 type objectIDVars struct {
 	ObjectID int `path:"objectID"`
 }
