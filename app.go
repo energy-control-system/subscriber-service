@@ -12,6 +12,7 @@ import (
 	dbsubscriber "subscriber-service/database/subscriber"
 	"subscriber-service/service/contract"
 	"subscriber-service/service/object"
+	"subscriber-service/service/registry"
 	"subscriber-service/service/subscriber"
 	"time"
 
@@ -46,6 +47,7 @@ type App struct {
 	subscriberService *subscriber.Service
 	objectService     *object.Service
 	contractService   *contract.Service
+	registryService   *registry.Service
 }
 
 func NewApp(mainCtx context.Context, log golog.Logger, settings config.Settings) *App {
@@ -94,6 +96,7 @@ func (a *App) InitServices() error {
 	a.subscriberService = subscriber.NewService(subscriberRepository)
 	a.objectService = object.NewService(objectRepository)
 	a.contractService = contract.NewService(contractRepository, subscriberRepository, taskClient)
+	a.registryService = registry.NewService(subscriberRepository, objectRepository, contractRepository)
 
 	return nil
 }
@@ -104,6 +107,7 @@ func (a *App) InitServer() {
 	sb.AddSubscribers(a.subscriberService)
 	sb.AddObjects(a.objectService)
 	sb.AddContracts(a.contractService)
+	sb.AddRegistry(a.registryService)
 
 	a.server = sb.Build()
 }

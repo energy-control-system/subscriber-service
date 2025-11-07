@@ -3,6 +3,7 @@ package contract
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"fmt"
 	"subscriber-service/service/contract"
 	"subscriber-service/service/object"
@@ -21,6 +22,9 @@ var (
 
 	//go:embed sql/get_last_contract_by_object_id.sql
 	getLastContractByObjectIDSQL string
+
+	//go:embed sql/upsert_contract.sql
+	upsertContractSQL string
 )
 
 type Repository struct {
@@ -48,7 +52,10 @@ func (r *Repository) AddContract(ctx context.Context, request contract.AddContra
 		return contract.Contract{}, fmt.Errorf("get object: %w", err)
 	}
 
-	dbContract := MapAddContractRequestToDB(request)
+	dbContract, err := MapAddContractRequestToDB(request)
+	if err != nil {
+		return contract.Contract{}, fmt.Errorf("map contract: %w", err)
+	}
 
 	err = db.NamedGetWithDB(ctx, r.db, &dbContract, addContractSQL, dbContract)
 	if err != nil {
@@ -133,4 +140,44 @@ func (r *Repository) GetLastContractByObjectID(ctx context.Context, objectID int
 	newContract.Object = obj
 
 	return newContract, nil
+}
+
+func (r *Repository) UpsertContracts(ctx context.Context, contracts []contract.UpsertContractRequest) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	dbContracts := MapUpsertContractRequestsToDB(contracts)
+	for _, dbContract := range dbContracts {
+		result, sqlErr := tx.NamedExecContext(ctx, upsertContractSQL, dbContract)
+		if sqlErr != nil {
+			err = fmt.Errorf("upsert contract: %w", sqlErr)
+			return err
+		}
+
+		rows, sqlErr := result.RowsAffected()
+		if sqlErr != nil {
+			err = fmt.Errorf("get rows affected: %w", sqlErr)
+			return err
+		}
+
+		if rows != 1 {
+			err = fmt.Errorf("rows affected = %d, expected 1", rows)
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return err
+	}
+
+	return err
 }

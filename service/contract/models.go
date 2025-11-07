@@ -11,7 +11,7 @@ type Contract struct {
 	Number     string                `json:"Number"`
 	Subscriber subscriber.Subscriber `json:"Subscriber"`
 	Object     object.Object         `json:"Object"`
-	SignDate   string                `json:"SignDate"`
+	SignDate   time.Time             `json:"SignDate"`
 	CreatedAt  time.Time             `json:"CreatedAt"`
 	UpdatedAt  time.Time             `json:"UpdatedAt"`
 }
@@ -21,4 +21,11 @@ type AddContractRequest struct {
 	SubscriberID int    `json:"SubscriberID"`
 	ObjectID     int    `json:"ObjectID"`
 	SignDate     string `json:"SignDate"`
+}
+
+type UpsertContractRequest struct {
+	Number                  string `json:"Number"`
+	SubscriberAccountNumber string `json:"SubscriberAccountNumber"`
+	ObjectAddress           string `json:"ObjectAddress"`
+	SignDate                string `json:"SignDate"`
 }

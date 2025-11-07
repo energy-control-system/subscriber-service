@@ -21,6 +21,22 @@ func MapAddObjectRequestDevicesToDB(devices []object.AddObjectRequestDevice, obj
 	return result
 }
 
+func MapUpsertObjectRequestToDB(request object.UpsertObjectRequest) UpsertObjectRequest {
+	return UpsertObjectRequest{
+		Address:       request.Address,
+		HaveAutomaton: request.HaveAutomaton,
+	}
+}
+
+func MapUpsertObjectRequestsToDB(requests []object.UpsertObjectRequest) []UpsertObjectRequest {
+	result := make([]UpsertObjectRequest, 0, len(requests))
+	for _, request := range requests {
+		result = append(result, MapUpsertObjectRequestToDB(request))
+	}
+
+	return result
+}
+
 func MapAddObjectRequestDeviceToDB(d object.AddObjectRequestDevice, objectID int) Device {
 	return Device{
 		ObjectID:         objectID,
@@ -40,12 +56,48 @@ func MapAddObjectRequestSealsToDB(seals []object.AddObjectRequestSeal, deviceID 
 	return result
 }
 
+func MapUpsertDeviceRequestToDB(request object.UpsertDeviceRequest) UpsertDeviceRequest {
+	return UpsertDeviceRequest{
+		ObjectAddress:    request.ObjectAddress,
+		Type:             request.Type,
+		Number:           request.Number,
+		PlaceType:        int(request.PlaceType),
+		PlaceDescription: request.PlaceDescription,
+	}
+}
+
+func MapUpsertDeviceRequestsToDB(requests []object.UpsertDeviceRequest) []UpsertDeviceRequest {
+	result := make([]UpsertDeviceRequest, 0, len(requests))
+	for _, request := range requests {
+		result = append(result, MapUpsertDeviceRequestToDB(request))
+	}
+
+	return result
+}
+
 func MapAddObjectRequestSealToDB(s object.AddObjectRequestSeal, deviceID int) Seal {
 	return Seal{
 		DeviceID: deviceID,
 		Number:   s.Number,
 		Place:    s.Place,
 	}
+}
+
+func MapUpsertSealRequestToDB(request object.UpsertSealRequest) UpsertSealRequest {
+	return UpsertSealRequest{
+		DeviceNumber: request.DeviceNumber,
+		Number:       request.Number,
+		Place:        request.Place,
+	}
+}
+
+func MapUpsertSealRequestsToDB(requests []object.UpsertSealRequest) []UpsertSealRequest {
+	result := make([]UpsertSealRequest, 0, len(requests))
+	for _, request := range requests {
+		result = append(result, MapUpsertSealRequestToDB(request))
+	}
+
+	return result
 }
 
 func MapObjectFromDB(o Object) object.Object {

@@ -29,3 +29,22 @@ type Seal struct {
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
+
+type UpsertObjectRequest struct {
+	Address       string `db:"address"`
+	HaveAutomaton bool   `db:"have_automaton"`
+}
+
+type UpsertDeviceRequest struct {
+	ObjectAddress    string `db:"object_address"`
+	Type             string `db:"type"`
+	Number           string `db:"number"`
+	PlaceType        int    `db:"place_type"`
+	PlaceDescription string `db:"place_description"`
+}
+
+type UpsertSealRequest struct {
+	DeviceNumber string `db:"device_number"`
+	Number       string `db:"number"`
+	Place        string `db:"place"`
+}

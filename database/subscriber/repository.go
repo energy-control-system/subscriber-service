@@ -33,6 +33,9 @@ var (
 
 	//go:embed sql/update_subscriber_status.sql
 	updateSubscriberStatusSQL string
+
+	//go:embed sql/upsert_subscriber.sql
+	upsertSubscriberSQL string
 )
 
 type Repository struct {
@@ -46,6 +49,11 @@ func NewRepository(db *sqlx.DB) *Repository {
 }
 
 func (r *Repository) AddSubscriber(ctx context.Context, request subscriber.AddSubscriberRequest) (subscriber.Subscriber, error) {
+	dbSubscriber, dbPassport, err := MapAddSubscriberRequestToDB(request)
+	if err != nil {
+		return subscriber.Subscriber{}, fmt.Errorf("map add subscriber request: %w", err)
+	}
+
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return subscriber.Subscriber{}, fmt.Errorf("begin transaction: %w", err)
@@ -55,11 +63,6 @@ func (r *Repository) AddSubscriber(ctx context.Context, request subscriber.AddSu
 			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
 		}
 	}()
-
-	dbSubscriber, dbPassport, err := MapAddSubscriberRequestToDB(request)
-	if err != nil {
-		return subscriber.Subscriber{}, fmt.Errorf("map add subscriber request: %w", err)
-	}
 
 	err = db.NamedGet(tx, &dbSubscriber, addSubscriberSQL, dbSubscriber)
 	if err != nil {
@@ -178,4 +181,48 @@ func (r *Repository) UpdateSubscriberStatus(ctx context.Context, subscriberID in
 	}
 
 	return nil
+}
+
+func (r *Repository) UpsertSubscribers(ctx context.Context, subscribers []subscriber.UpsertSubscriberRequest) error {
+	dbSubscribers, err := MapUpsertSubscriberRequestsToDB(subscribers)
+	if err != nil {
+		return fmt.Errorf("map requests: %w", err)
+	}
+
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	for _, dbSubscriber := range dbSubscribers {
+		result, sqlErr := tx.NamedExecContext(ctx, upsertSubscriberSQL, dbSubscriber)
+		if sqlErr != nil {
+			err = fmt.Errorf("upsert subscriber: %w", sqlErr)
+			return err
+		}
+
+		rows, sqlErr := result.RowsAffected()
+		if sqlErr != nil {
+			err = fmt.Errorf("get rows affected: %w", sqlErr)
+			return err
+		}
+
+		if rows != 1 {
+			err = fmt.Errorf("rows affected = %d, expected 1", rows)
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return err
+	}
+
+	return err
 }

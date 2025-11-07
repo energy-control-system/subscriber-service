@@ -7,6 +7,7 @@ import (
 	"subscriber-service/config"
 	"subscriber-service/service/contract"
 	"subscriber-service/service/object"
+	"subscriber-service/service/registry"
 	"subscriber-service/service/subscriber"
 
 	"github.com/sunshineOfficial/golib/gohttp/gorouter"
@@ -57,6 +58,11 @@ func (s *ServerBuilder) AddContracts(service *contract.Service) {
 	r.HandlePost("", handler.AddContract(service))
 	r.HandleGet("", handler.GetAllContracts(service))
 	r.HandleGet("/objects/{objectID}/last", handler.GetLastContractByObjectID(service))
+}
+
+func (s *ServerBuilder) AddRegistry(service *registry.Service) {
+	r := s.router.SubRouter("/registry")
+	r.HandlePost("/parse", handler.ParseRegistry(service))
 }
 
 func (s *ServerBuilder) Build() goserver.Server {

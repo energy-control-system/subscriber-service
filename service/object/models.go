@@ -20,6 +20,19 @@ const (
 	DevicePlaceStairLanding
 )
 
+func ParseDevicePlaceType(s string) DevicePlaceType {
+	switch s {
+	case "1":
+		return DevicePlaceOther
+	case "2":
+		return DevicePlaceFlat
+	case "3":
+		return DevicePlaceStairLanding
+	default:
+		return DevicePlaceUnknown
+	}
+}
+
 type Device struct {
 	ID               int             `json:"ID"`
 	ObjectID         int             `json:"ObjectID"`
@@ -58,4 +71,23 @@ type AddObjectRequestDevice struct {
 type AddObjectRequestSeal struct {
 	Number string `json:"Number"`
 	Place  string `json:"Place"`
+}
+
+type UpsertObjectRequest struct {
+	Address       string `json:"Address"`
+	HaveAutomaton bool   `json:"HaveAutomaton"`
+}
+
+type UpsertDeviceRequest struct {
+	ObjectAddress    string          `json:"ObjectAddress"`
+	Type             string          `json:"Type"`
+	Number           string          `json:"Number"`
+	PlaceType        DevicePlaceType `json:"PlaceType"`
+	PlaceDescription string          `json:"PlaceDescription"`
+}
+
+type UpsertSealRequest struct {
+	DeviceNumber string `json:"DeviceNumber"`
+	Number       string `json:"Number"`
+	Place        string `json:"Place"`
 }

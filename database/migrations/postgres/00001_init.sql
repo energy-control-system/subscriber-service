@@ -21,7 +21,7 @@ create table if not exists subscribers
     email          text        not null check ( email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' ),
     inn            text        not null check ( inn ~ '^\d{10,12}$' ), -- ИНН
     birth_date     date        not null check ( '1900-01-01' <= birth_date and birth_date < current_date ),
-    status         int         not null references subscriber_statuses (id) on delete restrict,
+    status         int         not null default 1 references subscriber_statuses (id) on delete restrict,
     created_at     timestamptz not null default now(),
     updated_at     timestamptz not null default now()
 );
@@ -33,13 +33,14 @@ create table if not exists passports
     series        text not null check ( series ~ '^\d{4}$' ), -- Серия
     number        text not null check ( number ~ '^\d{6}$' ), -- Номер
     issued_by     text not null,                              -- Кем выдан
-    issue_date    date not null                               -- Когда выдан
+    issue_date    date not null,                              -- Когда выдан
+    unique (series, number)
 );
 
 create table if not exists objects
 (
     id             int primary key generated always as identity,
-    address        text        not null,
+    address        text        not null unique,
     have_automaton bool        not null, -- Наличие коммутационного (вводного) аппарата
     created_at     timestamptz not null default now(),
     updated_at     timestamptz not null default now()
@@ -61,7 +62,7 @@ create table if not exists devices
     id                int primary key generated always as identity,
     object_id         int         not null references objects (id) on delete cascade,
     type              text        not null,
-    number            text        not null,
+    number            text        not null unique,
     place_type        int         not null references device_place_types (id) on delete restrict,
     place_description text        not null, -- Место установки прибора учета
     created_at        timestamptz not null default now(),
@@ -72,7 +73,7 @@ create table if not exists seals
 (
     id         int primary key generated always as identity,
     device_id  int         not null references devices (id) on delete cascade,
-    number     text        not null,
+    number     text        not null unique,
     place      text        not null, -- Место установки
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()

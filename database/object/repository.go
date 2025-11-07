@@ -45,6 +45,15 @@ var (
 
 	//go:embed sql/get_object_seals.sql
 	getObjectSealsSQL string
+
+	//go:embed sql/upsert_device.sql
+	upsertDeviceSQL string
+
+	//go:embed sql/upsert_object.sql
+	upsertObjectSQL string
+
+	//go:embed sql/upsert_seal.sql
+	upsertSealSQL string
 )
 
 type Repository struct {
@@ -334,4 +343,124 @@ func (r *Repository) GetAllObjects(ctx context.Context) ([]object.Object, error)
 	}
 
 	return objects, err
+}
+
+func (r *Repository) UpsertObjects(ctx context.Context, objects []object.UpsertObjectRequest) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	dbObjects := MapUpsertObjectRequestsToDB(objects)
+	for _, dbObject := range dbObjects {
+		result, sqlErr := tx.NamedExecContext(ctx, upsertObjectSQL, dbObject)
+		if sqlErr != nil {
+			err = fmt.Errorf("upsert object: %w", sqlErr)
+			return err
+		}
+
+		rows, sqlErr := result.RowsAffected()
+		if sqlErr != nil {
+			err = fmt.Errorf("get rows affected: %w", sqlErr)
+			return err
+		}
+
+		if rows != 1 {
+			err = fmt.Errorf("rows affected = %d, expected 1", rows)
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return err
+	}
+
+	return err
+}
+
+func (r *Repository) UpsertDevices(ctx context.Context, devices []object.UpsertDeviceRequest) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	dbDevices := MapUpsertDeviceRequestsToDB(devices)
+	for _, dbDevice := range dbDevices {
+		result, sqlErr := tx.NamedExecContext(ctx, upsertDeviceSQL, dbDevice)
+		if sqlErr != nil {
+			err = fmt.Errorf("upsert device: %w", sqlErr)
+			return err
+		}
+
+		rows, sqlErr := result.RowsAffected()
+		if sqlErr != nil {
+			err = fmt.Errorf("get rows affected: %w", sqlErr)
+			return err
+		}
+
+		if rows != 1 {
+			err = fmt.Errorf("rows affected = %d, expected 1", rows)
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return err
+	}
+
+	return err
+}
+
+func (r *Repository) UpsertSeals(ctx context.Context, seals []object.UpsertSealRequest) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	dbSeals := MapUpsertSealRequestsToDB(seals)
+	for _, dbSeal := range dbSeals {
+		result, sqlErr := tx.NamedExecContext(ctx, upsertSealSQL, dbSeal)
+		if sqlErr != nil {
+			err = fmt.Errorf("upsert seal: %w", sqlErr)
+			return err
+		}
+
+		rows, sqlErr := result.RowsAffected()
+		if sqlErr != nil {
+			err = fmt.Errorf("get rows affected: %w", sqlErr)
+			return err
+		}
+
+		if rows != 1 {
+			err = fmt.Errorf("rows affected = %d, expected 1", rows)
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return err
+	}
+
+	return err
 }
