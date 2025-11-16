@@ -1,0 +1,427 @@
+@startuml class
+!theme plain
+skinparam linetype ortho
+skinparam roundcorner 10
+skinparam shadowing false
+skinparam class {
+  BackgroundColor white
+  BorderColor black
+  ArrowColor black
+}
+skinparam package {
+  BackgroundColor white
+  BorderColor black
+}
+
+package "main" {
+  class App {
+    mainCtx
+    log
+    settings
+    server
+    postgres
+    kafka
+    inspectionConsumer
+    subscriberService
+    objectService
+    contractService
+    registryService
+  }
+}
+
+package "config" {
+  class Settings {
+    Port
+    Databases
+    Cluster
+  }
+
+  class Databases {
+    Postgres
+    Kafka
+  }
+
+  class Kafka {
+    Brokers
+    Topics
+  }
+
+  class Topics {
+    Inspections
+  }
+
+  class Cluster {
+    TaskService
+  }
+}
+
+package "api" {
+  class ServerBuilder {
+    server
+    router
+  }
+}
+
+package "service.subscriber" {
+  class SubscriberService {
+    repository
+  }
+
+  class Subscriber {
+    ID
+    AccountNumber
+    Surname
+    Name
+    Patronymic
+    PhoneNumber
+    Email
+    INN
+    BirthDate
+    Status
+    Passport
+    CreatedAt
+    UpdatedAt
+  }
+
+  class Passport {
+    ID
+    Series
+    Number
+    IssuedBy
+    IssueDate
+  }
+
+  class AddSubscriberRequest {
+    AccountNumber
+    Surname
+    Name
+    Patronymic
+    PhoneNumber
+    Email
+    INN
+    BirthDate
+    Passport
+  }
+
+  class AddSubscriberRequestPassport {
+    Series
+    Number
+    IssuedBy
+    IssueDate
+  }
+
+  class UpsertSubscriberRequest {
+    AccountNumber
+    Surname
+    Name
+    Patronymic
+    PhoneNumber
+    Email
+    INN
+    BirthDate
+    Passport
+  }
+}
+
+package "service.object" {
+  class ObjectService {
+    repository
+  }
+
+  class Object {
+    ID
+    Address
+    HaveAutomaton
+    CreatedAt
+    UpdatedAt
+    Devices
+  }
+
+  class Device {
+    ID
+    ObjectID
+    Type
+    Number
+    PlaceType
+    PlaceDescription
+    CreatedAt
+    UpdatedAt
+    Seals
+  }
+
+  class Seal {
+    ID
+    DeviceID
+    Number
+    Place
+    CreatedAt
+    UpdatedAt
+  }
+
+  class AddObjectRequest {
+    Address
+    HaveAutomaton
+    Devices
+  }
+
+  class AddObjectRequestDevice {
+    Type
+    Number
+    PlaceType
+    PlaceDescription
+    Seals
+  }
+
+  class AddObjectRequestSeal {
+    Number
+    Place
+  }
+
+  class UpsertObjectRequest {
+    Address
+    HaveAutomaton
+  }
+
+  class UpsertDeviceRequest {
+    ObjectAddress
+    Type
+    Number
+    PlaceType
+    PlaceDescription
+  }
+
+  class UpsertSealRequest {
+    DeviceNumber
+    Number
+    Place
+  }
+}
+
+package "service.contract" {
+  class ContractService {
+    repository
+    subscriberRepository
+    taskService
+  }
+
+  class Contract {
+    ID
+    Number
+    Subscriber
+    Object
+    SignDate
+    CreatedAt
+    UpdatedAt
+  }
+
+  class AddContractRequest {
+    Number
+    SubscriberID
+    ObjectID
+    SignDate
+  }
+
+  class UpsertContractRequest {
+    Number
+    SubscriberAccountNumber
+    ObjectAddress
+    SignDate
+  }
+}
+
+package "service.registry" {
+  class RegistryService {
+    subscriberRepository
+    objectRepository
+    contractRepository
+  }
+}
+
+package "database.subscriber" {
+  class SubscriberRepository {
+    db
+  }
+
+  class SubscriberDB {
+    ID
+    AccountNumber
+    Surname
+    Name
+    Patronymic
+    PhoneNumber
+    Email
+    INN
+    BirthDate
+    Status
+    CreatedAt
+    UpdatedAt
+  }
+
+  class PassportDB {
+    ID
+    SubscriberID
+    Series
+    Number
+    IssuedBy
+    IssueDate
+  }
+}
+
+package "database.object" {
+  class ObjectRepository {
+    db
+  }
+
+  class ObjectDB {
+    ID
+    Address
+    HaveAutomaton
+    CreatedAt
+    UpdatedAt
+  }
+
+  class DeviceDB {
+    ID
+    ObjectID
+    Type
+    Number
+    PlaceType
+    PlaceDescription
+    CreatedAt
+    UpdatedAt
+  }
+
+  class SealDB {
+    ID
+    DeviceID
+    Number
+    Place
+    CreatedAt
+    UpdatedAt
+  }
+}
+
+package "database.contract" {
+  class ContractRepository {
+    db
+    subscriberRepository
+    objectRepository
+  }
+
+  class ContractDB {
+    ID
+    Number
+    SubscriberID
+    ObjectID
+    SignDate
+    CreatedAt
+    UpdatedAt
+  }
+}
+
+package "cluster.task" {
+  class TaskClient {
+    client
+    baseURL
+  }
+
+  class Task {
+    ID
+    BrigadeID
+    ObjectID
+    PlanVisitAt
+    Status
+    Comment
+    StartedAt
+    FinishedAt
+    CreatedAt
+    UpdatedAt
+  }
+}
+
+package "cluster.inspection" {
+  class Inspection {
+    ID
+    TaskID
+    Status
+    Type
+    Resolution
+    LimitReason
+    Method
+    MethodBy
+    ReasonType
+    ReasonDescription
+    IsRestrictionChecked
+    IsViolationDetected
+    IsExpenseAvailable
+    ViolationDescription
+    IsUnauthorizedConsumers
+    UnauthorizedDescription
+    UnauthorizedExplanation
+    InspectAt
+    EnergyActionAt
+    CreatedAt
+    UpdatedAt
+  }
+
+  class Event {
+    Type
+    Date
+    UserID
+    Inspection
+  }
+}
+
+' Relationships - Configuration
+Settings *-- Databases
+Settings *-- Cluster
+Databases *-- Kafka
+Kafka *-- Topics
+
+' Relationships - Application
+App *-- Settings
+App *-- ServerBuilder
+App *-- SubscriberService
+App *-- ObjectService
+App *-- ContractService
+App *-- RegistryService
+
+' Relationships - Services
+SubscriberService *-- SubscriberRepository
+ObjectService *-- ObjectRepository
+ContractService *-- ContractRepository
+ContractService ..> SubscriberRepository
+ContractService ..> TaskClient
+RegistryService ..> SubscriberRepository
+RegistryService ..> ObjectRepository
+RegistryService ..> ContractRepository
+
+' Relationships - Models
+Subscriber *-- Passport
+Object *-- Device
+Device *-- Seal
+Contract *-- Subscriber
+Contract *-- Object
+
+' Relationships - Database Models
+SubscriberDB *-- PassportDB
+ObjectDB *-- DeviceDB
+DeviceDB *-- SealDB
+ContractDB ..> SubscriberDB
+ContractDB ..> ObjectDB
+
+' Relationships - Request Models
+AddSubscriberRequest *-- AddSubscriberRequestPassport
+UpsertSubscriberRequest *-- AddSubscriberRequestPassport
+AddObjectRequest *-- AddObjectRequestDevice
+AddObjectRequestDevice *-- AddObjectRequestSeal
+
+' Relationships - Cluster
+Event *-- Inspection
+Inspection ..> Task
+
+' Cross-package relationships
+ContractRepository ..> SubscriberRepository
+ContractRepository ..> ObjectRepository
+
+@enduml
