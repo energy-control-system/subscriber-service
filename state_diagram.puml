@@ -1,0 +1,67 @@
+@startuml "Диаграмма состояний и переходов объекта «Абонент»"
+
+skinparam state {
+  BackgroundColor<<active>> #C8E6C9
+  BackgroundColor<<violator>> #FFCDD2
+  BackgroundColor<<archived>> #E0E0E0
+  BorderColor #424242
+  FontSize 13
+  ArrowColor #424242
+}
+
+skinparam note {
+  BackgroundColor #FFFDE7
+  BorderColor #F9A825
+}
+
+title Диаграмма состояний и переходов\nобъекта «Абонент» (Subscriber)
+
+state "Активный\n(Active)" as Active <<active>>
+state "Нарушитель\n(Violator)" as Violator <<violator>>
+state "Архивный\n(Archived)" as Archived <<archived>>
+
+' ===== Переходы =====
+
+' T1: Регистрация
+[*] --> Active : Регистрация\nабонента
+
+' T2: Проверка → нарушение обнаружено
+Active --> Violator : Проверка:\nнарушение обнаружено
+
+' T3: Повторная проверка → нарушение не обнаружено
+Violator --> Active : Проверка:\nнарушение\nне обнаружено
+
+' T4: Архивирование активного
+Active --> Archived : Архивирование
+
+' T5: Архивирование нарушителя
+Violator --> Archived : Архивирование
+
+' T6: Восстановление из архива
+Archived --> Active : Восстановление\nиз архива
+
+' T7: Проверка активного — нарушений нет (self-loop)
+Active -[#2E7D32]-> Active : Проверка:\nнарушение\nне обнаружено
+
+' T8: Проверка нарушителя — нарушение снова (self-loop)
+Violator -[#C62828]-> Violator : Проверка:\nнарушение\nобнаружено
+
+' ===== Маршруты тестирования =====
+
+note bottom of Active
+  <b>Маршруты тестирования:</b>
+
+  <color:#1565C0><b>Маршрут 1</b></color> (все состояния + основные переходы):
+  [*] → Активный → Нарушитель → Активный → Архивный → Активный
+  Покрывает: T1, T2, T3, T4, T6
+
+  <color:#C62828><b>Маршрут 2</b></color> (архивирование нарушителя):
+  [*] → Активный → Нарушитель → Архивный
+  Покрывает: T1, T2, T5
+
+  <color:#2E7D32><b>Маршрут 3</b></color> (self-loop переходы):
+  [*] → Активный → Активный → Нарушитель → Нарушитель
+  Покрывает: T1, T7, T2, T8
+end note
+
+@enduml

@@ -1,427 +1,245 @@
-@startuml class
-!theme plain
+@startuml class_diagram
+skinparam monochrome true
 skinparam linetype ortho
-skinparam roundcorner 10
-skinparam shadowing false
-skinparam class {
-  BackgroundColor white
-  BorderColor black
-  ArrowColor black
-}
-skinparam package {
-  BackgroundColor white
-  BorderColor black
-}
+skinparam classAttributeIconSize 0
+skinparam classFontSize 10
+skinparam packageFontSize 11
+skinparam nodesep 20
+skinparam ranksep 20
+left to right direction
 
-package "main" {
-  class App {
-    mainCtx
-    log
-    settings
-    server
-    postgres
-    kafka
-    inspectionConsumer
-    subscriberService
-    objectService
-    contractService
-    registryService
-  }
-}
-
-package "config" {
-  class Settings {
-    Port
-    Databases
-    Cluster
-  }
-
-  class Databases {
-    Postgres
-    Kafka
-  }
-
-  class Kafka {
-    Brokers
-    Topics
-  }
-
-  class Topics {
-    Inspections
-  }
-
-  class Cluster {
-    TaskService
-  }
-}
+title Диаграмма классов subscriber-service
 
 package "api" {
-  class ServerBuilder {
-    server
-    router
-  }
+    class ServerBuilder {
+        -server: Server
+        -router: Router
+        +AddSubscribers()
+        +AddObjects()
+        +AddContracts()
+        +AddRegistry()
+        +Build(): Server
+    }
+
+    class SubscriberHandler {
+        +AddSubscriber()
+        +GetSubscriberByID()
+        +GetAllSubscribers()
+    }
+
+    class ObjectHandler {
+        +AddObject()
+        +GetObjectByID()
+        +GetAllObjects()
+    }
+
+    class ContractHandler {
+        +AddContract()
+        +GetAllContracts()
+        +GetLastContractByObjectID()
+    }
+
+    class RegistryHandler {
+        +ParseRegistry()
+    }
 }
 
-package "service.subscriber" {
-  class SubscriberService {
-    repository
-  }
+package "service" {
+    class SubscriberService {
+        -repository: SubscriberRepository
+        +AddSubscriber()
+        +GetSubscriberByID()
+        +GetAllSubscribers()
+    }
 
-  class Subscriber {
-    ID
-    AccountNumber
-    Surname
-    Name
-    Patronymic
-    PhoneNumber
-    Email
-    INN
-    BirthDate
-    Status
-    Passport
-    CreatedAt
-    UpdatedAt
-  }
+    class ObjectService {
+        -repository: ObjectRepository
+        +AddObject()
+        +GetObjectByID()
+        +GetAllObjects()
+    }
 
-  class Passport {
-    ID
-    Series
-    Number
-    IssuedBy
-    IssueDate
-  }
+    class ContractService {
+        -repository: ContractRepository
+        -taskService: TaskService
+        +AddContract()
+        +GetAllContracts()
+        +GetLastContractByObjectID()
+        +SubscriberOnInspectionEvent()
+    }
 
-  class AddSubscriberRequest {
-    AccountNumber
-    Surname
-    Name
-    Patronymic
-    PhoneNumber
-    Email
-    INN
-    BirthDate
-    Passport
-  }
+    class RegistryService {
+        -subscriberRepo: SubscriberRepository
+        -objectRepo: ObjectRepository
+        -contractRepo: ContractRepository
+        +Parse()
+    }
 
-  class AddSubscriberRequestPassport {
-    Series
-    Number
-    IssuedBy
-    IssueDate
-  }
+    interface SubscriberRepository {
+        +AddSubscriber()
+        +GetSubscriberByID()
+        +GetAllSubscribers()
+        +UpdateSubscriberStatus()
+        +UpsertSubscribers()
+    }
 
-  class UpsertSubscriberRequest {
-    AccountNumber
-    Surname
-    Name
-    Patronymic
-    PhoneNumber
-    Email
-    INN
-    BirthDate
-    Passport
-  }
+    interface ObjectRepository {
+        +AddObject()
+        +GetObjectByID()
+        +GetAllObjects()
+        +UpsertObjects()
+        +UpsertDevices()
+        +UpsertSeals()
+    }
+
+    interface ContractRepository {
+        +AddContract()
+        +GetAllContracts()
+        +GetLastContractByObjectID()
+        +UpsertContracts()
+    }
+
+    interface TaskService {
+        +GetTaskByID()
+    }
 }
 
-package "service.object" {
-  class ObjectService {
-    repository
-  }
+package "database" {
+    class SubscriberDBRepository {
+        -db: *sqlx.DB
+    }
 
-  class Object {
-    ID
-    Address
-    HaveAutomaton
-    CreatedAt
-    UpdatedAt
-    Devices
-  }
+    class ObjectDBRepository {
+        -db: *sqlx.DB
+    }
 
-  class Device {
-    ID
-    ObjectID
-    Type
-    Number
-    PlaceType
-    PlaceDescription
-    CreatedAt
-    UpdatedAt
-    Seals
-  }
-
-  class Seal {
-    ID
-    DeviceID
-    Number
-    Place
-    CreatedAt
-    UpdatedAt
-  }
-
-  class AddObjectRequest {
-    Address
-    HaveAutomaton
-    Devices
-  }
-
-  class AddObjectRequestDevice {
-    Type
-    Number
-    PlaceType
-    PlaceDescription
-    Seals
-  }
-
-  class AddObjectRequestSeal {
-    Number
-    Place
-  }
-
-  class UpsertObjectRequest {
-    Address
-    HaveAutomaton
-  }
-
-  class UpsertDeviceRequest {
-    ObjectAddress
-    Type
-    Number
-    PlaceType
-    PlaceDescription
-  }
-
-  class UpsertSealRequest {
-    DeviceNumber
-    Number
-    Place
-  }
+    class ContractDBRepository {
+        -db: *sqlx.DB
+    }
 }
 
-package "service.contract" {
-  class ContractService {
-    repository
-    subscriberRepository
-    taskService
-  }
-
-  class Contract {
-    ID
-    Number
-    Subscriber
-    Object
-    SignDate
-    CreatedAt
-    UpdatedAt
-  }
-
-  class AddContractRequest {
-    Number
-    SubscriberID
-    ObjectID
-    SignDate
-  }
-
-  class UpsertContractRequest {
-    Number
-    SubscriberAccountNumber
-    ObjectAddress
-    SignDate
-  }
+package "cluster" {
+    class TaskClient {
+        -client: HTTPClient
+        -baseURL: string
+        +GetTaskByID()
+    }
 }
 
-package "service.registry" {
-  class RegistryService {
-    subscriberRepository
-    objectRepository
-    contractRepository
-  }
+package "domain" {
+    class Subscriber {
+        +ID: int
+        +AccountNumber: string
+        +Surname: string
+        +Name: string
+        +PhoneNumber: string
+        +Email: string
+        +INN: string
+        +Status: Status
+        +Passport: Passport
+    }
+
+    class Passport {
+        +ID: int
+        +Series: string
+        +Number: string
+        +IssuedBy: string
+        +IssueDate: string
+    }
+
+    class Object {
+        +ID: int
+        +Address: string
+        +HaveAutomaton: bool
+        +Devices: []Device
+    }
+
+    class Device {
+        +ID: int
+        +ObjectID: int
+        +Type: string
+        +Number: string
+        +PlaceType: DevicePlaceType
+        +Seals: []Seal
+    }
+
+    class Seal {
+        +ID: int
+        +DeviceID: int
+        +Number: string
+        +Place: string
+    }
+
+    class Contract {
+        +ID: int
+        +Number: string
+        +SubscriberID: int
+        +ObjectID: int
+        +SignDate: time.Time
+    }
+
+    class Task {
+        +ID: int
+        +ObjectID: int
+        +Status: Status
+    }
+
+    class Inspection {
+        +ID: int
+        +TaskID: int
+        +Status: Status
+        +Type: Type
+        +IsViolationDetected: bool
+    }
+
+    enum Status {
+        Active
+        Violator
+        Archived
+    }
+
+    enum DevicePlaceType {
+        Other
+        Flat
+        StairLanding
+    }
 }
 
-package "database.subscriber" {
-  class SubscriberRepository {
-    db
-  }
+' API relationships
+ServerBuilder --> SubscriberHandler
+ServerBuilder --> ObjectHandler
+ServerBuilder --> ContractHandler
+ServerBuilder --> RegistryHandler
 
-  class SubscriberDB {
-    ID
-    AccountNumber
-    Surname
-    Name
-    Patronymic
-    PhoneNumber
-    Email
-    INN
-    BirthDate
-    Status
-    CreatedAt
-    UpdatedAt
-  }
+' Handler to Service
+SubscriberHandler --> SubscriberService
+ObjectHandler --> ObjectService
+ContractHandler --> ContractService
+RegistryHandler --> RegistryService
 
-  class PassportDB {
-    ID
-    SubscriberID
-    Series
-    Number
-    IssuedBy
-    IssueDate
-  }
-}
+' Service to Repository
+SubscriberService --> SubscriberRepository
+ObjectService --> ObjectRepository
+ContractService --> ContractRepository
+ContractService --> TaskService
+RegistryService --> SubscriberRepository
+RegistryService --> ObjectRepository
+RegistryService --> ContractRepository
 
-package "database.object" {
-  class ObjectRepository {
-    db
-  }
+' Repository implementations
+SubscriberDBRepository ..|> SubscriberRepository
+ObjectDBRepository ..|> ObjectRepository
+ContractDBRepository ..|> ContractRepository
+TaskClient ..|> TaskService
 
-  class ObjectDB {
-    ID
-    Address
-    HaveAutomaton
-    CreatedAt
-    UpdatedAt
-  }
-
-  class DeviceDB {
-    ID
-    ObjectID
-    Type
-    Number
-    PlaceType
-    PlaceDescription
-    CreatedAt
-    UpdatedAt
-  }
-
-  class SealDB {
-    ID
-    DeviceID
-    Number
-    Place
-    CreatedAt
-    UpdatedAt
-  }
-}
-
-package "database.contract" {
-  class ContractRepository {
-    db
-    subscriberRepository
-    objectRepository
-  }
-
-  class ContractDB {
-    ID
-    Number
-    SubscriberID
-    ObjectID
-    SignDate
-    CreatedAt
-    UpdatedAt
-  }
-}
-
-package "cluster.task" {
-  class TaskClient {
-    client
-    baseURL
-  }
-
-  class Task {
-    ID
-    BrigadeID
-    ObjectID
-    PlanVisitAt
-    Status
-    Comment
-    StartedAt
-    FinishedAt
-    CreatedAt
-    UpdatedAt
-  }
-}
-
-package "cluster.inspection" {
-  class Inspection {
-    ID
-    TaskID
-    Status
-    Type
-    Resolution
-    LimitReason
-    Method
-    MethodBy
-    ReasonType
-    ReasonDescription
-    IsRestrictionChecked
-    IsViolationDetected
-    IsExpenseAvailable
-    ViolationDescription
-    IsUnauthorizedConsumers
-    UnauthorizedDescription
-    UnauthorizedExplanation
-    InspectAt
-    EnergyActionAt
-    CreatedAt
-    UpdatedAt
-  }
-
-  class Event {
-    Type
-    Date
-    UserID
-    Inspection
-  }
-}
-
-' Relationships - Configuration
-Settings *-- Databases
-Settings *-- Cluster
-Databases *-- Kafka
-Kafka *-- Topics
-
-' Relationships - Application
-App *-- Settings
-App *-- ServerBuilder
-App *-- SubscriberService
-App *-- ObjectService
-App *-- ContractService
-App *-- RegistryService
-
-' Relationships - Services
-SubscriberService *-- SubscriberRepository
-ObjectService *-- ObjectRepository
-ContractService *-- ContractRepository
-ContractService ..> SubscriberRepository
-ContractService ..> TaskClient
-RegistryService ..> SubscriberRepository
-RegistryService ..> ObjectRepository
-RegistryService ..> ContractRepository
-
-' Relationships - Models
+' Domain relationships
 Subscriber *-- Passport
+Subscriber --> Status
 Object *-- Device
 Device *-- Seal
-Contract *-- Subscriber
-Contract *-- Object
-
-' Relationships - Database Models
-SubscriberDB *-- PassportDB
-ObjectDB *-- DeviceDB
-DeviceDB *-- SealDB
-ContractDB ..> SubscriberDB
-ContractDB ..> ObjectDB
-
-' Relationships - Request Models
-AddSubscriberRequest *-- AddSubscriberRequestPassport
-UpsertSubscriberRequest *-- AddSubscriberRequestPassport
-AddObjectRequest *-- AddObjectRequestDevice
-AddObjectRequestDevice *-- AddObjectRequestSeal
-
-' Relationships - Cluster
-Event *-- Inspection
-Inspection ..> Task
-
-' Cross-package relationships
-ContractRepository ..> SubscriberRepository
-ContractRepository ..> ObjectRepository
+Device --> DevicePlaceType
+Contract --> Subscriber
+Contract --> Object
+Inspection --> Task
 
 @enduml

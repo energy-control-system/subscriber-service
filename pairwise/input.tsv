@@ -1,0 +1,8 @@
+account_number-length	account_number-structure	account_number-content	phone-length	phone-structure	inn-length	inn-content	email-length	email-structure	email-content
+0-4	А...	А-Я	0-11	+7...	0-10	0-9	0-8	*@*.*	a-Z
+4-20	...0	0-9	11-12	8...	10-12	other	8-32	other	0-9
+20-inf	--	-	12-inf	other	12-inf		32-inf		.
+	-	other							@
+									-
+									_
+									other

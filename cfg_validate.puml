@@ -1,0 +1,60 @@
+@startuml
+hide empty description
+
+title Граф потока управления: ValidateAccountNumber
+
+skinparam state {
+    BackgroundColor White
+    BorderColor Black
+    FontSize 16
+    FontName Helvetica
+}
+skinparam ArrowFontSize 11
+
+[*] --> A : accountNumber
+
+A --> B
+
+B --> C : да
+B --> D : нет
+C --> [*]
+
+D --> E : да
+D --> F : нет
+E --> [*]
+
+F --> G : да
+F --> H : нет
+G --> [*]
+
+H --> I : да
+H --> J : нет
+I --> [*]
+
+J --> K
+
+K --> L : ещё
+K --> S : конец
+
+L --> M : да
+L --> N : нет
+
+M --> K
+
+N --> O : да
+N --> R : нет
+
+O --> P : да
+O --> Q : нет
+P --> [*]
+
+Q --> K
+
+R --> [*]
+
+S --> T : да
+S --> U : нет
+T --> [*]
+U --> [*]
+
+@enduml

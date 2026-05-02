@@ -17,6 +17,10 @@ func NewService(repository Repository) *Service {
 }
 
 func (s *Service) AddSubscriber(ctx goctx.Context, request AddSubscriberRequest) (Subscriber, error) {
+	if err := ValidateAccountNumber(request.AccountNumber); err != nil {
+		return Subscriber{}, fmt.Errorf("validate account number: %w", err)
+	}
+
 	sub, err := s.repository.AddSubscriber(ctx, request)
 	if err != nil {
 		return Subscriber{}, fmt.Errorf("add subscriber to repository: %w", err)

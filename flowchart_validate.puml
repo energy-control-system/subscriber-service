@@ -1,0 +1,69 @@
+@startuml
+title Блок-схема алгоритма ValidateAccountNumber
+
+start
+
+:<b>a</b>  Ввод: accountNumber;
+
+:<b>b</b>  runes = []rune(accountNumber)
+length = len(runes);
+
+if (<b>c</b>  length < 4 ?) then (да)
+  :<b>d</b>  return ErrTooShort;
+  stop
+else (нет)
+endif
+
+if (<b>e</b>  length > 20 ?) then (да)
+  :<b>f</b>  return ErrTooLong;
+  stop
+else (нет)
+endif
+
+if (<b>g</b>  Первый символ\nне заглавная русская буква ?) then (да)
+  :<b>h</b>  return ErrStartNotLetter;
+  stop
+else (нет)
+endif
+
+if (<b>i</b>  Последний символ\nне цифра ?) then (да)
+  :<b>j</b>  return ErrEndNotDigit;
+  stop
+else (нет)
+endif
+
+:<b>k</b>  hasHyphen = false
+prevHyphen = false;
+
+while (<b>l</b>  Ещё есть символы ?) is (да)
+  if (<b>m</b>  isDigit(r) или\nisUpperRussianLetter(r) ?) then (да)
+    :<b>n</b>  prevHyphen = false;
+  else (нет)
+    if (<b>o</b>  r == '-' ?) then (да)
+      if (<b>p</b>  prevHyphen ?) then (да)
+        :<b>q</b>  return\nErrConsecutiveHyphens;
+        stop
+      else (нет)
+        :<b>r</b>  hasHyphen = true
+prevHyphen = true;
+      endif
+    else (нет)
+      :<b>s</b>  return ErrInvalidChar;
+      stop
+    endif
+  endif
+endwhile (нет)
+
+if (<b>v</b>  !hasHyphen ?) then (да)
+  :<b>w</b>  return ErrNoHyphen;
+  stop
+else (нет)
+endif
+
+:<b>x</b>  return nil;
+
+:<b>y</b>  Вывод: error;
+
+stop
+
+@enduml
