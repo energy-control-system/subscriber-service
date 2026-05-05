@@ -1,0 +1,560 @@
+basePath: /api/subscriber-service
+definitions:
+  contract.AddContractRequest:
+    properties:
+      Number:
+        type: string
+      ObjectID:
+        type: integer
+      SignDate:
+        type: string
+      SubscriberID:
+        type: integer
+    type: object
+  gorouter.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  gorouter.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/gorouter.ErrorInfo'
+    type: object
+  object.AddObjectRequest:
+    properties:
+      Address:
+        type: string
+      Devices:
+        items:
+          $ref: '#/definitions/object.AddObjectRequestDevice'
+        type: array
+      HaveAutomaton:
+        type: boolean
+    type: object
+  object.AddObjectRequestDevice:
+    properties:
+      Number:
+        type: string
+      PlaceDescription:
+        type: string
+      PlaceType:
+        $ref: '#/definitions/object.DevicePlaceType'
+      Seals:
+        items:
+          $ref: '#/definitions/object.AddObjectRequestSeal'
+        type: array
+      Type:
+        type: string
+    type: object
+  object.AddObjectRequestSeal:
+    properties:
+      Number:
+        type: string
+      Place:
+        type: string
+    type: object
+  object.DevicePlaceType:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - DevicePlaceUnknown
+    - DevicePlaceOther
+    - DevicePlaceFlat
+    - DevicePlaceStairLanding
+  subscriber-service_service_contract.Contract:
+    properties:
+      CreatedAt:
+        type: string
+      ID:
+        type: integer
+      Number:
+        type: string
+      Object:
+        $ref: '#/definitions/subscriber-service_service_object.Object'
+      SignDate:
+        type: string
+      Subscriber:
+        $ref: '#/definitions/subscriber-service_service_subscriber.Subscriber'
+      UpdatedAt:
+        type: string
+    type: object
+  subscriber-service_service_object.Device:
+    properties:
+      CreatedAt:
+        type: string
+      ID:
+        type: integer
+      Number:
+        type: string
+      ObjectID:
+        type: integer
+      PlaceDescription:
+        type: string
+      PlaceType:
+        $ref: '#/definitions/object.DevicePlaceType'
+      Seals:
+        items:
+          $ref: '#/definitions/subscriber-service_service_object.Seal'
+        type: array
+      Type:
+        type: string
+      UpdatedAt:
+        type: string
+    type: object
+  subscriber-service_service_object.Object:
+    properties:
+      Address:
+        type: string
+      CreatedAt:
+        type: string
+      Devices:
+        items:
+          $ref: '#/definitions/subscriber-service_service_object.Device'
+        type: array
+      HaveAutomaton:
+        type: boolean
+      ID:
+        type: integer
+      UpdatedAt:
+        type: string
+    type: object
+  subscriber-service_service_object.Seal:
+    properties:
+      CreatedAt:
+        type: string
+      DeviceID:
+        type: integer
+      ID:
+        type: integer
+      Number:
+        type: string
+      Place:
+        type: string
+      UpdatedAt:
+        type: string
+    type: object
+  subscriber-service_service_subscriber.Passport:
+    properties:
+      ID:
+        type: integer
+      IssueDate:
+        type: string
+      IssuedBy:
+        type: string
+      Number:
+        type: string
+      Series:
+        type: string
+    type: object
+  subscriber-service_service_subscriber.Subscriber:
+    properties:
+      AccountNumber:
+        type: string
+      BirthDate:
+        type: string
+      CreatedAt:
+        type: string
+      Email:
+        type: string
+      ID:
+        type: integer
+      INN:
+        type: string
+      Name:
+        type: string
+      Passport:
+        $ref: '#/definitions/subscriber-service_service_subscriber.Passport'
+      Patronymic:
+        type: string
+      PhoneNumber:
+        type: string
+      Status:
+        $ref: '#/definitions/subscriber.Status'
+      Surname:
+        type: string
+      UpdatedAt:
+        type: string
+    type: object
+  subscriber.AddSubscriberRequest:
+    properties:
+      AccountNumber:
+        type: string
+      BirthDate:
+        type: string
+      Email:
+        type: string
+      INN:
+        type: string
+      Name:
+        type: string
+      Passport:
+        $ref: '#/definitions/subscriber.AddSubscriberRequestPassport'
+      Patronymic:
+        type: string
+      PhoneNumber:
+        type: string
+      Surname:
+        type: string
+    type: object
+  subscriber.AddSubscriberRequestPassport:
+    properties:
+      IssueDate:
+        type: string
+      IssuedBy:
+        type: string
+      Number:
+        type: string
+      Series:
+        type: string
+    type: object
+  subscriber.Status:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - StatusUnknown
+    - StatusActive
+    - StatusViolator
+    - StatusArchived
+info:
+  contact: {}
+  description: API for subscribers, metering objects, contracts, and registry import.
+  title: Subscriber Service API
+  version: "1.0"
+paths:
+  /contracts:
+    get:
+      description: Returns all contracts.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/subscriber-service_service_contract.Contract'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: List contracts
+      tags:
+      - contracts
+    post:
+      consumes:
+      - application/json
+      description: Creates a contract between subscriber and metering object.
+      parameters:
+      - description: Contract creation payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/contract.AddContractRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriber-service_service_contract.Contract'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Create contract
+      tags:
+      - contracts
+  /contracts/objects/{objectID}/last:
+    get:
+      description: Returns the latest contract for a metering object.
+      parameters:
+      - description: Object ID
+        in: path
+        name: objectID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriber-service_service_contract.Contract'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Get latest object contract
+      tags:
+      - contracts
+  /objects:
+    get:
+      description: Returns all metering objects.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/subscriber-service_service_object.Object'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: List objects
+      tags:
+      - objects
+    post:
+      consumes:
+      - application/json
+      description: Creates a metering object with devices and seals.
+      parameters:
+      - description: Object creation payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/object.AddObjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriber-service_service_object.Object'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Create metering object
+      tags:
+      - objects
+  /objects/{id}:
+    get:
+      description: Returns a metering object by identifier.
+      parameters:
+      - description: Object ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriber-service_service_object.Object'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Get object by ID
+      tags:
+      - objects
+  /objects/devices/{deviceID}:
+    get:
+      description: Returns a metering object containing the specified device.
+      parameters:
+      - description: Device ID
+        in: path
+        name: deviceID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriber-service_service_object.Object'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Get object by device ID
+      tags:
+      - objects
+  /objects/seals/{sealID}:
+    get:
+      description: Returns a metering object containing the specified seal.
+      parameters:
+      - description: Seal ID
+        in: path
+        name: sealID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriber-service_service_object.Object'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Get object by seal ID
+      tags:
+      - objects
+  /registry/parse:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Parses an Excel registry and imports subscribers, objects, devices,
+        seals, and contracts.
+      parameters:
+      - description: Registry Excel file
+        in: formData
+        name: File
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Import registry
+      tags:
+      - registry
+  /subscribers:
+    get:
+      description: Returns all subscribers.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/subscriber-service_service_subscriber.Subscriber'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: List subscribers
+      tags:
+      - subscribers
+    post:
+      consumes:
+      - application/json
+      description: Creates a subscriber with passport data.
+      parameters:
+      - description: Subscriber creation payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/subscriber.AddSubscriberRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriber-service_service_subscriber.Subscriber'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Create subscriber
+      tags:
+      - subscribers
+  /subscribers/{id}:
+    get:
+      description: Returns subscriber data by identifier.
+      parameters:
+      - description: Subscriber ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriber-service_service_subscriber.Subscriber'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gorouter.ErrorResponse'
+      summary: Get subscriber by ID
+      tags:
+      - subscribers
+swagger: "2.0"

@@ -34,7 +34,7 @@ func NewServerBuilder(ctx context.Context, log golog.Logger, settings config.Set
 }
 
 func (s *ServerBuilder) AddDebug() {
-	s.router.Install(plugin.NewPProf(), plugin.NewMetrics())
+	s.router.Install(plugin.NewPProf(), plugin.NewMetrics(), plugin.NewSwaggo("api/subscriber-service"))
 }
 
 func (s *ServerBuilder) AddSubscribers(service *subscriber.Service) {

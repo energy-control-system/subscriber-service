@@ -8,6 +8,17 @@ import (
 	"github.com/sunshineOfficial/golib/gohttp/gorouter"
 )
 
+// AddContract godoc
+// @Summary Create contract
+// @Description Creates a contract between subscriber and metering object.
+// @Tags contracts
+// @Accept json
+// @Produce json
+// @Param request body contract.AddContractRequest true "Contract creation payload"
+// @Success 200 {object} contract.Contract
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /contracts [post]
 func AddContract(s *contract.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		var request contract.AddContractRequest
@@ -24,6 +35,14 @@ func AddContract(s *contract.Service) gorouter.Handler {
 	}
 }
 
+// GetAllContracts godoc
+// @Summary List contracts
+// @Description Returns all contracts.
+// @Tags contracts
+// @Produce json
+// @Success 200 {array} contract.Contract
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /contracts [get]
 func GetAllContracts(s *contract.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		response, err := s.GetAllContracts(c.Ctx())
@@ -39,6 +58,17 @@ type objectIDVars struct {
 	ObjectID int `path:"objectID"`
 }
 
+// GetLastContractByObjectID godoc
+// @Summary Get latest object contract
+// @Description Returns the latest contract for a metering object.
+// @Tags contracts
+// @Produce json
+// @Param objectID path int true "Object ID"
+// @Success 200 {object} contract.Contract
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /contracts/objects/{objectID}/last [get]
 func GetLastContractByObjectID(s *contract.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		var vars objectIDVars

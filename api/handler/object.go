@@ -8,6 +8,17 @@ import (
 	"github.com/sunshineOfficial/golib/gohttp/gorouter"
 )
 
+// AddObject godoc
+// @Summary Create metering object
+// @Description Creates a metering object with devices and seals.
+// @Tags objects
+// @Accept json
+// @Produce json
+// @Param request body object.AddObjectRequest true "Object creation payload"
+// @Success 200 {object} object.Object
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /objects [post]
 func AddObject(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		var request object.AddObjectRequest
@@ -24,6 +35,17 @@ func AddObject(s *object.Service) gorouter.Handler {
 	}
 }
 
+// GetObjectByID godoc
+// @Summary Get object by ID
+// @Description Returns a metering object by identifier.
+// @Tags objects
+// @Produce json
+// @Param id path int true "Object ID"
+// @Success 200 {object} object.Object
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /objects/{id} [get]
 func GetObjectByID(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		var vars idVars
@@ -44,6 +66,17 @@ type deviceIDVars struct {
 	DeviceID int `path:"deviceID"`
 }
 
+// GetObjectByDeviceID godoc
+// @Summary Get object by device ID
+// @Description Returns a metering object containing the specified device.
+// @Tags objects
+// @Produce json
+// @Param deviceID path int true "Device ID"
+// @Success 200 {object} object.Object
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /objects/devices/{deviceID} [get]
 func GetObjectByDeviceID(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		var vars deviceIDVars
@@ -64,6 +97,17 @@ type sealIDVars struct {
 	SealID int `path:"sealID"`
 }
 
+// GetObjectBySealID godoc
+// @Summary Get object by seal ID
+// @Description Returns a metering object containing the specified seal.
+// @Tags objects
+// @Produce json
+// @Param sealID path int true "Seal ID"
+// @Success 200 {object} object.Object
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /objects/seals/{sealID} [get]
 func GetObjectBySealID(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		var vars sealIDVars
@@ -80,6 +124,14 @@ func GetObjectBySealID(s *object.Service) gorouter.Handler {
 	}
 }
 
+// GetAllObjects godoc
+// @Summary List objects
+// @Description Returns all metering objects.
+// @Tags objects
+// @Produce json
+// @Success 200 {array} object.Object
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /objects [get]
 func GetAllObjects(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		response, err := s.GetAllObjects(c.Ctx())

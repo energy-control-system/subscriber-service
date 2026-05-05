@@ -8,8 +8,14 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/sunshineOfficial/golib/golog"
 	"github.com/sunshineOfficial/golib/goos"
+
+	_ "subscriber-service/docs"
 )
 
+// @title Subscriber Service API
+// @version 1.0
+// @description API for subscribers, metering objects, contracts, and registry import.
+// @BasePath /api/subscriber-service
 func main() {
 	configureDecimal()
 

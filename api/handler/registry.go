@@ -8,6 +8,16 @@ import (
 	"github.com/sunshineOfficial/golib/gohttp/gorouter"
 )
 
+// ParseRegistry godoc
+// @Summary Import registry
+// @Description Parses an Excel registry and imports subscribers, objects, devices, seals, and contracts.
+// @Tags registry
+// @Accept multipart/form-data
+// @Param File formData file true "Registry Excel file"
+// @Success 200
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /registry/parse [post]
 func ParseRegistry(s *registry.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
 		files, err := c.FormFiles("File")
