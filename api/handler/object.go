@@ -6,6 +6,7 @@ import (
 	"subscriber-service/service/object"
 
 	"github.com/sunshineOfficial/golib/gohttp/gorouter"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 // AddObject godoc
@@ -129,12 +130,20 @@ func GetObjectBySealID(s *object.Service) gorouter.Handler {
 // @Description Returns all metering objects.
 // @Tags objects
 // @Produce json
+// @Param limit query int false "Maximum number of items to return; 0 means no limit"
+// @Param offset query int false "Number of items to skip"
 // @Success 200 {array} object.Object
+// @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
 // @Router /objects [get]
 func GetAllObjects(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
-		response, err := s.GetAllObjects(c.Ctx())
+		var vars pagination.Pagination
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read pagination: %w", err)
+		}
+
+		response, err := s.GetAllObjects(c.Ctx(), vars)
 		if err != nil {
 			return fmt.Errorf("failed to get all objects: %w", err)
 		}

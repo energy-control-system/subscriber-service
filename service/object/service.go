@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sunshineOfficial/golib/goctx"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 type Service struct {
@@ -52,8 +53,12 @@ func (s *Service) GetObjectBySealID(ctx goctx.Context, sealID int) (Object, erro
 	return obj, nil
 }
 
-func (s *Service) GetAllObjects(ctx goctx.Context) ([]Object, error) {
-	objects, err := s.repository.GetAllObjects(ctx)
+func (s *Service) GetAllObjects(ctx goctx.Context, page pagination.Pagination) ([]Object, error) {
+	if err := page.Validate(); err != nil {
+		return nil, fmt.Errorf("validate pagination: %w", err)
+	}
+
+	objects, err := s.repository.GetAllObjects(ctx, page)
 	if err != nil {
 		return nil, fmt.Errorf("get all objects from repository: %w", err)
 	}

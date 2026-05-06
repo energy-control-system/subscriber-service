@@ -12,6 +12,7 @@ import (
 	"github.com/sunshineOfficial/golib/goctx"
 	"github.com/sunshineOfficial/golib/gokafka"
 	"github.com/sunshineOfficial/golib/golog"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 const kafkaSubscribeTimeout = 2 * time.Minute
@@ -39,8 +40,12 @@ func (s *Service) AddContract(ctx goctx.Context, request AddContractRequest) (Co
 	return c, nil
 }
 
-func (s *Service) GetAllContracts(ctx goctx.Context) ([]Contract, error) {
-	contracts, err := s.repository.GetAllContracts(ctx)
+func (s *Service) GetAllContracts(ctx goctx.Context, page pagination.Pagination) ([]Contract, error) {
+	if err := page.Validate(); err != nil {
+		return nil, fmt.Errorf("validate pagination: %w", err)
+	}
+
+	contracts, err := s.repository.GetAllContracts(ctx, page)
 	if err != nil {
 		return nil, fmt.Errorf("get all contracts from repository: %w", err)
 	}

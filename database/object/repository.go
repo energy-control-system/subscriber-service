@@ -10,6 +10,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sunshineOfficial/golib/db"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 var (
@@ -283,7 +284,7 @@ func (r *Repository) GetObjectBySealID(ctx context.Context, sealID int) (object.
 	return obj, err
 }
 
-func (r *Repository) GetAllObjects(ctx context.Context) ([]object.Object, error) {
+func (r *Repository) GetAllObjects(ctx context.Context, page pagination.Pagination) ([]object.Object, error) {
 	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
 		return nil, fmt.Errorf("begin transaction: %w", err)
@@ -295,21 +296,33 @@ func (r *Repository) GetAllObjects(ctx context.Context) ([]object.Object, error)
 	}()
 
 	var dbObjects []Object
-	err = tx.SelectContext(ctx, &dbObjects, getAllObjectsSQL)
+	err = tx.SelectContext(ctx, &dbObjects, getAllObjectsSQL, page.LimitArg(), page.Offset)
 	if err != nil {
 		err = fmt.Errorf("get all objects: %w", err)
 		return nil, err
 	}
+	if len(dbObjects) == 0 {
+		if err = tx.Commit(); err != nil {
+			err = fmt.Errorf("commit transaction: %w", err)
+			return nil, err
+		}
+		return []object.Object{}, nil
+	}
+
+	objectIDs := make([]int, 0, len(dbObjects))
+	for _, dbObject := range dbObjects {
+		objectIDs = append(objectIDs, dbObject.ID)
+	}
 
 	var dbDevices []Device
-	err = tx.SelectContext(ctx, &dbDevices, getAllDevicesSQL)
+	err = tx.SelectContext(ctx, &dbDevices, getAllDevicesSQL, objectIDs)
 	if err != nil {
 		err = fmt.Errorf("get all devices: %w", err)
 		return nil, err
 	}
 
 	var dbSeals []Seal
-	err = tx.SelectContext(ctx, &dbSeals, getAllSealsSQL)
+	err = tx.SelectContext(ctx, &dbSeals, getAllSealsSQL, objectIDs)
 	if err != nil {
 		err = fmt.Errorf("get all seals: %w", err)
 		return nil, err

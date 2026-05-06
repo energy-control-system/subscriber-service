@@ -1,9 +1,13 @@
 package subscriber
 
-import "context"
+import (
+	"context"
+
+	"github.com/sunshineOfficial/golib/pagination"
+)
 
 type Repository interface {
 	AddSubscriber(ctx context.Context, request AddSubscriberRequest) (Subscriber, error)
 	GetSubscriberByID(ctx context.Context, id int) (Subscriber, error)
-	GetAllSubscribers(ctx context.Context) ([]Subscriber, error)
+	GetAllSubscribers(ctx context.Context, page pagination.Pagination) ([]Subscriber, error)
 }

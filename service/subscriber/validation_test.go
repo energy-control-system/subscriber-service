@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/sunshineOfficial/golib/goctx"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 func TestValidateAccountNumber(t *testing.T) {
@@ -214,7 +215,7 @@ func TestValidateAccountNumber(t *testing.T) {
 type mockRepository struct {
 	addSubscriberFunc     func(ctx context.Context, request AddSubscriberRequest) (Subscriber, error)
 	getSubscriberByIDFunc func(ctx context.Context, id int) (Subscriber, error)
-	getAllSubscribersFunc func(ctx context.Context) ([]Subscriber, error)
+	getAllSubscribersFunc func(ctx context.Context, page pagination.Pagination) ([]Subscriber, error)
 }
 
 func (m *mockRepository) AddSubscriber(ctx context.Context, request AddSubscriberRequest) (Subscriber, error) {
@@ -231,9 +232,9 @@ func (m *mockRepository) GetSubscriberByID(ctx context.Context, id int) (Subscri
 	return Subscriber{}, nil
 }
 
-func (m *mockRepository) GetAllSubscribers(ctx context.Context) ([]Subscriber, error) {
+func (m *mockRepository) GetAllSubscribers(ctx context.Context, page pagination.Pagination) ([]Subscriber, error) {
 	if m.getAllSubscribersFunc != nil {
-		return m.getAllSubscribersFunc(ctx)
+		return m.getAllSubscribersFunc(ctx, page)
 	}
 	return nil, nil
 }

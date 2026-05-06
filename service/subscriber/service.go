@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sunshineOfficial/golib/goctx"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 type Service struct {
@@ -38,8 +39,12 @@ func (s *Service) GetSubscriberByID(ctx goctx.Context, id int) (Subscriber, erro
 	return subscriber, nil
 }
 
-func (s *Service) GetAllSubscribers(ctx goctx.Context) ([]Subscriber, error) {
-	subscribers, err := s.repository.GetAllSubscribers(ctx)
+func (s *Service) GetAllSubscribers(ctx goctx.Context, page pagination.Pagination) ([]Subscriber, error) {
+	if err := page.Validate(); err != nil {
+		return nil, fmt.Errorf("validate pagination: %w", err)
+	}
+
+	subscribers, err := s.repository.GetAllSubscribers(ctx, page)
 	if err != nil {
 		return nil, fmt.Errorf("get all subscribers from repository: %w", err)
 	}

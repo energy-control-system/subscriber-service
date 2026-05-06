@@ -10,6 +10,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sunshineOfficial/golib/db"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 var (
@@ -124,7 +125,7 @@ func (r *Repository) GetSubscriberByID(ctx context.Context, id int) (subscriber.
 	return newSubscriber, err
 }
 
-func (r *Repository) GetAllSubscribers(ctx context.Context) ([]subscriber.Subscriber, error) {
+func (r *Repository) GetAllSubscribers(ctx context.Context, page pagination.Pagination) ([]subscriber.Subscriber, error) {
 	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
 		return nil, fmt.Errorf("begin transaction: %w", err)
@@ -136,14 +137,26 @@ func (r *Repository) GetAllSubscribers(ctx context.Context) ([]subscriber.Subscr
 	}()
 
 	var dbSubscribers []Subscriber
-	err = tx.SelectContext(ctx, &dbSubscribers, getAllSubscribersSQL)
+	err = tx.SelectContext(ctx, &dbSubscribers, getAllSubscribersSQL, page.LimitArg(), page.Offset)
 	if err != nil {
 		err = fmt.Errorf("get all subscribers: %w", err)
 		return nil, err
 	}
+	if len(dbSubscribers) == 0 {
+		if err = tx.Commit(); err != nil {
+			err = fmt.Errorf("commit transaction: %w", err)
+			return nil, err
+		}
+		return []subscriber.Subscriber{}, nil
+	}
+
+	subscriberIDs := make([]int, 0, len(dbSubscribers))
+	for _, dbSubscriber := range dbSubscribers {
+		subscriberIDs = append(subscriberIDs, dbSubscriber.ID)
+	}
 
 	var dbPassports []Passport
-	err = tx.SelectContext(ctx, &dbPassports, getAllPassportsSQL)
+	err = tx.SelectContext(ctx, &dbPassports, getAllPassportsSQL, subscriberIDs)
 	if err != nil {
 		err = fmt.Errorf("get all passports: %w", err)
 		return nil, err

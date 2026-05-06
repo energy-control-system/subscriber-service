@@ -6,4 +6,5 @@ select id,
        place_description,
        created_at,
        updated_at
-from devices;
+from devices
+where object_id = any ($1);

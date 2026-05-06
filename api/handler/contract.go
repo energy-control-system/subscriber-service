@@ -6,6 +6,7 @@ import (
 	"subscriber-service/service/contract"
 
 	"github.com/sunshineOfficial/golib/gohttp/gorouter"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 // AddContract godoc
@@ -40,12 +41,20 @@ func AddContract(s *contract.Service) gorouter.Handler {
 // @Description Returns all contracts.
 // @Tags contracts
 // @Produce json
+// @Param limit query int false "Maximum number of items to return; 0 means no limit"
+// @Param offset query int false "Number of items to skip"
 // @Success 200 {array} contract.Contract
+// @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
 // @Router /contracts [get]
 func GetAllContracts(s *contract.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
-		response, err := s.GetAllContracts(c.Ctx())
+		var vars pagination.Pagination
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read pagination: %w", err)
+		}
+
+		response, err := s.GetAllContracts(c.Ctx(), vars)
 		if err != nil {
 			return fmt.Errorf("failed to get all contracts: %w", err)
 		}

@@ -6,11 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"subscriber-service/service/contract"
-	"subscriber-service/service/object"
-	"subscriber-service/service/subscriber"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sunshineOfficial/golib/db"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 var (
@@ -69,43 +68,23 @@ func (r *Repository) AddContract(ctx context.Context, request contract.AddContra
 	return newContract, nil
 }
 
-func (r *Repository) GetAllContracts(ctx context.Context) ([]contract.Contract, error) {
+func (r *Repository) GetAllContracts(ctx context.Context, page pagination.Pagination) ([]contract.Contract, error) {
 	var dbContracts []Contract
-	err := r.db.SelectContext(ctx, &dbContracts, getAllContractsSQL)
+	err := r.db.SelectContext(ctx, &dbContracts, getAllContractsSQL, page.LimitArg(), page.Offset)
 	if err != nil {
 		return nil, fmt.Errorf("get all contracts: %w", err)
 	}
 
-	subscribers, err := r.subscriberRepository.GetAllSubscribers(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("get all subscribers: %w", err)
-	}
-
-	objects, err := r.objectRepository.GetAllObjects(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("get all objects: %w", err)
-	}
-
-	subscriberMap := make(map[int]subscriber.Subscriber)
-	for _, sub := range subscribers {
-		subscriberMap[sub.ID] = sub
-	}
-
-	objectMap := make(map[int]object.Object)
-	for _, obj := range objects {
-		objectMap[obj.ID] = obj
-	}
-
 	contracts := make([]contract.Contract, 0, len(dbContracts))
 	for _, dbContract := range dbContracts {
-		sub, ok := subscriberMap[dbContract.SubscriberID]
-		if !ok {
-			return nil, fmt.Errorf("subscriber %d not found for contract %d", dbContract.SubscriberID, dbContract.ID)
+		sub, err := r.subscriberRepository.GetSubscriberByID(ctx, dbContract.SubscriberID)
+		if err != nil {
+			return nil, fmt.Errorf("get subscriber %d for contract %d: %w", dbContract.SubscriberID, dbContract.ID, err)
 		}
 
-		obj, ok := objectMap[dbContract.ObjectID]
-		if !ok {
-			return nil, fmt.Errorf("object %d not found for contract %d", dbContract.ObjectID, dbContract.ID)
+		obj, err := r.objectRepository.GetObjectByID(ctx, dbContract.ObjectID)
+		if err != nil {
+			return nil, fmt.Errorf("get object %d for contract %d: %w", dbContract.ObjectID, dbContract.ID, err)
 		}
 
 		newContract := MapContractFromDB(dbContract)

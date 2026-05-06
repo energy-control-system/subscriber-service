@@ -25,6 +25,20 @@ const docTemplate = `{
                     "contracts"
                 ],
                 "summary": "List contracts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Maximum number of items to return; 0 means no limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items to skip",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -33,6 +47,12 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/subscriber-service_service_contract.Contract"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gorouter.ErrorResponse"
                         }
                     },
                     "500": {
@@ -145,6 +165,20 @@ const docTemplate = `{
                     "objects"
                 ],
                 "summary": "List objects",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Maximum number of items to return; 0 means no limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items to skip",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -153,6 +187,12 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/subscriber-service_service_object.Object"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gorouter.ErrorResponse"
                         }
                     },
                     "500": {
@@ -397,6 +437,20 @@ const docTemplate = `{
                     "subscribers"
                 ],
                 "summary": "List subscribers",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Maximum number of items to return; 0 means no limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items to skip",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -405,6 +459,12 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/subscriber-service_service_subscriber.Subscriber"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gorouter.ErrorResponse"
                         }
                     },
                     "500": {

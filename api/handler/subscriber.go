@@ -6,6 +6,7 @@ import (
 	"subscriber-service/service/subscriber"
 
 	"github.com/sunshineOfficial/golib/gohttp/gorouter"
+	"github.com/sunshineOfficial/golib/pagination"
 )
 
 // AddSubscriber godoc
@@ -71,12 +72,20 @@ func GetSubscriberByID(s *subscriber.Service) gorouter.Handler {
 // @Description Returns all subscribers.
 // @Tags subscribers
 // @Produce json
+// @Param limit query int false "Maximum number of items to return; 0 means no limit"
+// @Param offset query int false "Number of items to skip"
 // @Success 200 {array} subscriber.Subscriber
+// @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
 // @Router /subscribers [get]
 func GetAllSubscribers(s *subscriber.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
-		response, err := s.GetAllSubscribers(c.Ctx())
+		var vars pagination.Pagination
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read pagination: %w", err)
+		}
+
+		response, err := s.GetAllSubscribers(c.Ctx(), vars)
 		if err != nil {
 			return fmt.Errorf("failed to get all subscribers: %w", err)
 		}
