@@ -8,6 +8,23 @@ const docTemplate = `{
     "schemes": {{ marshal .Schemes }},
     "components": {
         "schemas": {
+            "contract.AddContractRequest": {
+                "properties": {
+                    "Number": {
+                        "type": "string"
+                    },
+                    "ObjectID": {
+                        "type": "integer"
+                    },
+                    "SignDate": {
+                        "type": "string"
+                    },
+                    "SubscriberID": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "gorouter.ErrorInfo": {
                 "properties": {
                     "code": {
@@ -27,22 +44,73 @@ const docTemplate = `{
                 },
                 "type": "object"
             },
-            "subscriber-service_service_contract.AddContractRequest": {
+            "object.AddObjectRequest": {
+                "properties": {
+                    "Address": {
+                        "type": "string"
+                    },
+                    "Devices": {
+                        "items": {
+                            "$ref": "#/components/schemas/object.AddObjectRequestDevice"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "HaveAutomaton": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "object.AddObjectRequestDevice": {
                 "properties": {
                     "Number": {
                         "type": "string"
                     },
-                    "ObjectID": {
-                        "type": "integer"
-                    },
-                    "SignDate": {
+                    "PlaceDescription": {
                         "type": "string"
                     },
-                    "SubscriberID": {
-                        "type": "integer"
+                    "PlaceType": {
+                        "$ref": "#/components/schemas/object.DevicePlaceType"
+                    },
+                    "Seals": {
+                        "items": {
+                            "$ref": "#/components/schemas/object.AddObjectRequestSeal"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "Type": {
+                        "type": "string"
                     }
                 },
                 "type": "object"
+            },
+            "object.AddObjectRequestSeal": {
+                "properties": {
+                    "Number": {
+                        "type": "string"
+                    },
+                    "Place": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "object.DevicePlaceType": {
+                "enum": [
+                    0,
+                    1,
+                    2,
+                    3
+                ],
+                "type": "integer",
+                "x-enum-varnames": [
+                    "DevicePlaceUnknown",
+                    "DevicePlaceOther",
+                    "DevicePlaceFlat",
+                    "DevicePlaceStairLanding"
+                ]
             },
             "subscriber-service_service_contract.Contract": {
                 "properties": {
@@ -70,59 +138,6 @@ const docTemplate = `{
                 },
                 "type": "object"
             },
-            "subscriber-service_service_object.AddObjectRequest": {
-                "properties": {
-                    "Address": {
-                        "type": "string"
-                    },
-                    "Devices": {
-                        "items": {
-                            "$ref": "#/components/schemas/subscriber-service_service_object.AddObjectRequestDevice"
-                        },
-                        "type": "array",
-                        "uniqueItems": false
-                    },
-                    "HaveAutomaton": {
-                        "type": "boolean"
-                    }
-                },
-                "type": "object"
-            },
-            "subscriber-service_service_object.AddObjectRequestDevice": {
-                "properties": {
-                    "Number": {
-                        "type": "string"
-                    },
-                    "PlaceDescription": {
-                        "type": "string"
-                    },
-                    "PlaceType": {
-                        "$ref": "#/components/schemas/subscriber-service_service_object.DevicePlaceType"
-                    },
-                    "Seals": {
-                        "items": {
-                            "$ref": "#/components/schemas/subscriber-service_service_object.AddObjectRequestSeal"
-                        },
-                        "type": "array",
-                        "uniqueItems": false
-                    },
-                    "Type": {
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
-            "subscriber-service_service_object.AddObjectRequestSeal": {
-                "properties": {
-                    "Number": {
-                        "type": "string"
-                    },
-                    "Place": {
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
             "subscriber-service_service_object.Device": {
                 "properties": {
                     "CreatedAt": {
@@ -141,7 +156,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "PlaceType": {
-                        "$ref": "#/components/schemas/subscriber-service_service_object.DevicePlaceType"
+                        "$ref": "#/components/schemas/object.DevicePlaceType"
                     },
                     "Seals": {
                         "items": {
@@ -158,21 +173,6 @@ const docTemplate = `{
                     }
                 },
                 "type": "object"
-            },
-            "subscriber-service_service_object.DevicePlaceType": {
-                "enum": [
-                    0,
-                    1,
-                    2,
-                    3
-                ],
-                "type": "integer",
-                "x-enum-varnames": [
-                    "DevicePlaceUnknown",
-                    "DevicePlaceOther",
-                    "DevicePlaceFlat",
-                    "DevicePlaceStairLanding"
-                ]
             },
             "subscriber-service_service_object.Object": {
                 "properties": {
@@ -224,55 +224,6 @@ const docTemplate = `{
                 },
                 "type": "object"
             },
-            "subscriber-service_service_subscriber.AddSubscriberRequest": {
-                "properties": {
-                    "AccountNumber": {
-                        "type": "string"
-                    },
-                    "BirthDate": {
-                        "type": "string"
-                    },
-                    "Email": {
-                        "type": "string"
-                    },
-                    "INN": {
-                        "type": "string"
-                    },
-                    "Name": {
-                        "type": "string"
-                    },
-                    "Passport": {
-                        "$ref": "#/components/schemas/subscriber-service_service_subscriber.AddSubscriberRequestPassport"
-                    },
-                    "Patronymic": {
-                        "type": "string"
-                    },
-                    "PhoneNumber": {
-                        "type": "string"
-                    },
-                    "Surname": {
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
-            "subscriber-service_service_subscriber.AddSubscriberRequestPassport": {
-                "properties": {
-                    "IssueDate": {
-                        "type": "string"
-                    },
-                    "IssuedBy": {
-                        "type": "string"
-                    },
-                    "Number": {
-                        "type": "string"
-                    },
-                    "Series": {
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
             "subscriber-service_service_subscriber.Passport": {
                 "properties": {
                     "ID": {
@@ -292,21 +243,6 @@ const docTemplate = `{
                     }
                 },
                 "type": "object"
-            },
-            "subscriber-service_service_subscriber.Status": {
-                "enum": [
-                    0,
-                    1,
-                    2,
-                    3
-                ],
-                "type": "integer",
-                "x-enum-varnames": [
-                    "StatusUnknown",
-                    "StatusActive",
-                    "StatusViolator",
-                    "StatusArchived"
-                ]
             },
             "subscriber-service_service_subscriber.Subscriber": {
                 "properties": {
@@ -341,7 +277,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "Status": {
-                        "$ref": "#/components/schemas/subscriber-service_service_subscriber.Status"
+                        "$ref": "#/components/schemas/subscriber.Status"
                     },
                     "Surname": {
                         "type": "string"
@@ -351,6 +287,70 @@ const docTemplate = `{
                     }
                 },
                 "type": "object"
+            },
+            "subscriber.AddSubscriberRequest": {
+                "properties": {
+                    "AccountNumber": {
+                        "type": "string"
+                    },
+                    "BirthDate": {
+                        "type": "string"
+                    },
+                    "Email": {
+                        "type": "string"
+                    },
+                    "INN": {
+                        "type": "string"
+                    },
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Passport": {
+                        "$ref": "#/components/schemas/subscriber.AddSubscriberRequestPassport"
+                    },
+                    "Patronymic": {
+                        "type": "string"
+                    },
+                    "PhoneNumber": {
+                        "type": "string"
+                    },
+                    "Surname": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "subscriber.AddSubscriberRequestPassport": {
+                "properties": {
+                    "IssueDate": {
+                        "type": "string"
+                    },
+                    "IssuedBy": {
+                        "type": "string"
+                    },
+                    "Number": {
+                        "type": "string"
+                    },
+                    "Series": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "subscriber.Status": {
+                "enum": [
+                    0,
+                    1,
+                    2,
+                    3
+                ],
+                "type": "integer",
+                "x-enum-varnames": [
+                    "StatusUnknown",
+                    "StatusActive",
+                    "StatusViolator",
+                    "StatusArchived"
+                ]
             }
         }
     },
@@ -436,7 +436,7 @@ const docTemplate = `{
                                         "type": "object"
                                     },
                                     {
-                                        "$ref": "#/components/schemas/subscriber-service_service_contract.AddContractRequest",
+                                        "$ref": "#/components/schemas/contract.AddContractRequest",
                                         "summary": "request",
                                         "description": "Contract creation payload"
                                     }
@@ -480,6 +480,65 @@ const docTemplate = `{
                     }
                 },
                 "summary": "Create contract",
+                "tags": [
+                    "contracts"
+                ]
+            }
+        },
+        "/contracts/objects/last": {
+            "get": {
+                "description": "Returns latest contracts for several metering objects.",
+                "parameters": [
+                    {
+                        "description": "Object IDs",
+                        "in": "query",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/subscriber-service_service_contract.Contract"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "Get latest object contracts",
                 "tags": [
                     "contracts"
                 ]
@@ -619,7 +678,7 @@ const docTemplate = `{
                                         "type": "object"
                                     },
                                     {
-                                        "$ref": "#/components/schemas/subscriber-service_service_object.AddObjectRequest",
+                                        "$ref": "#/components/schemas/object.AddObjectRequest",
                                         "summary": "request",
                                         "description": "Object creation payload"
                                     }
@@ -977,7 +1036,7 @@ const docTemplate = `{
                                         "type": "object"
                                     },
                                     {
-                                        "$ref": "#/components/schemas/subscriber-service_service_subscriber.AddSubscriberRequest",
+                                        "$ref": "#/components/schemas/subscriber.AddSubscriberRequest",
                                         "summary": "request",
                                         "description": "Subscriber creation payload"
                                     }

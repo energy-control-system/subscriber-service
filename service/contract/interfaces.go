@@ -13,6 +13,7 @@ type Repository interface {
 	AddContract(ctx context.Context, request AddContractRequest) (Contract, error)
 	GetAllContracts(ctx context.Context, page pagination.Pagination) ([]Contract, error)
 	GetLastContractByObjectID(ctx context.Context, objectID int) (Contract, error)
+	GetLastContractsByObjectIDs(ctx context.Context, objectIDs []int) ([]Contract, error)
 }
 
 type SubscriberRepository interface {

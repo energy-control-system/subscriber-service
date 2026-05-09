@@ -62,6 +62,15 @@ func (s *Service) GetLastContractByObjectID(ctx goctx.Context, objectID int) (Co
 	return c, nil
 }
 
+func (s *Service) GetLastContractsByObjectIDs(ctx goctx.Context, objectIDs []int) ([]Contract, error) {
+	contracts, err := s.repository.GetLastContractsByObjectIDs(ctx, objectIDs)
+	if err != nil {
+		return nil, fmt.Errorf("get last contracts from repository: %w", err)
+	}
+
+	return contracts, nil
+}
+
 func (s *Service) SubscriberOnInspectionEvent(mainCtx context.Context, log golog.Logger) gokafka.Subscriber {
 	return func(message gokafka.Message, err error) {
 		ctx, cancel := context.WithTimeout(mainCtx, kafkaSubscribeTimeout)

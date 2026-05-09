@@ -22,6 +22,9 @@ var (
 	//go:embed sql/get_last_contract_by_object_id.sql
 	getLastContractByObjectIDSQL string
 
+	//go:embed sql/get_last_contracts_by_object_ids.sql
+	getLastContractsByObjectIDsSQL string
+
 	//go:embed sql/upsert_contract.sql
 	upsertContractSQL string
 )
@@ -119,6 +122,45 @@ func (r *Repository) GetLastContractByObjectID(ctx context.Context, objectID int
 	newContract.Object = obj
 
 	return newContract, nil
+}
+
+func (r *Repository) GetLastContractsByObjectIDs(ctx context.Context, objectIDs []int) ([]contract.Contract, error) {
+	if len(objectIDs) == 0 {
+		return []contract.Contract{}, nil
+	}
+
+	query, args, err := sqlx.In(getLastContractsByObjectIDsSQL, objectIDs)
+	if err != nil {
+		return nil, fmt.Errorf("build get last contracts by object ids query: %w", err)
+	}
+	query = r.db.Rebind(query)
+
+	var dbContracts []Contract
+	err = r.db.SelectContext(ctx, &dbContracts, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("get last contracts by object ids: %w", err)
+	}
+
+	contracts := make([]contract.Contract, 0, len(dbContracts))
+	for _, dbContract := range dbContracts {
+		sub, err := r.subscriberRepository.GetSubscriberByID(ctx, dbContract.SubscriberID)
+		if err != nil {
+			return nil, fmt.Errorf("get subscriber %d for contract %d: %w", dbContract.SubscriberID, dbContract.ID, err)
+		}
+
+		obj, err := r.objectRepository.GetObjectByID(ctx, dbContract.ObjectID)
+		if err != nil {
+			return nil, fmt.Errorf("get object %d for contract %d: %w", dbContract.ObjectID, dbContract.ID, err)
+		}
+
+		newContract := MapContractFromDB(dbContract)
+		newContract.Subscriber = sub
+		newContract.Object = obj
+
+		contracts = append(contracts, newContract)
+	}
+
+	return contracts, nil
 }
 
 func (r *Repository) UpsertContracts(ctx context.Context, contracts []contract.UpsertContractRequest) error {

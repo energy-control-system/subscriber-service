@@ -67,6 +67,36 @@ type objectIDVars struct {
 	ObjectID int `path:"objectID"`
 }
 
+type objectIDsVars struct {
+	IDs []int `query:"id"`
+}
+
+// GetLastContractsByObjectIDs godoc
+// @Summary Get latest object contracts
+// @Description Returns latest contracts for several metering objects.
+// @Tags contracts
+// @Produce json
+// @Param id query []int true "Object IDs" collectionFormat(multi)
+// @Success 200 {array} contract.Contract
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /contracts/objects/last [get]
+func GetLastContractsByObjectIDs(s *contract.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		var vars objectIDsVars
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read object ids: %w", err)
+		}
+
+		response, err := s.GetLastContractsByObjectIDs(c.Ctx(), vars.IDs)
+		if err != nil {
+			return fmt.Errorf("failed to get last contracts: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}
+
 // GetLastContractByObjectID godoc
 // @Summary Get latest object contract
 // @Description Returns the latest contract for a metering object.

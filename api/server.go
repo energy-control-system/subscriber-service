@@ -57,6 +57,7 @@ func (s *ServerBuilder) AddContracts(service *contract.Service) {
 	r := s.router.SubRouter("/contracts")
 	r.HandlePost("", handler.AddContract(service))
 	r.HandleGet("", handler.GetAllContracts(service))
+	r.HandleGet("/objects/last", handler.GetLastContractsByObjectIDs(service))
 	r.HandleGet("/objects/{objectID}/last", handler.GetLastContractByObjectID(service))
 }
 
