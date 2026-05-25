@@ -93,3 +93,23 @@ func MapPassportFromDB(p Passport) subscriber.Passport {
 		IssueDate: p.IssueDate,
 	}
 }
+
+func MapContractFromDB(c Contract) subscriber.Contract {
+	return subscriber.Contract{
+		ID:        c.ID,
+		Number:    c.Number,
+		ObjectID:  c.ObjectID,
+		SignDate:  c.SignDate,
+		CreatedAt: c.CreatedAt,
+		UpdatedAt: c.UpdatedAt,
+	}
+}
+
+func MapContractsFromDB(contracts []Contract) []subscriber.Contract {
+	result := make([]subscriber.Contract, 0, len(contracts))
+	for _, c := range contracts {
+		result = append(result, MapContractFromDB(c))
+	}
+
+	return result
+}

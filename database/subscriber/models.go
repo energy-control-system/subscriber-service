@@ -26,6 +26,16 @@ type Passport struct {
 	IssueDate    string `db:"issue_date"`
 }
 
+type Contract struct {
+	ID           int       `db:"id"`
+	Number       string    `db:"number"`
+	SubscriberID int       `db:"subscriber_id"`
+	ObjectID     int       `db:"object_id"`
+	SignDate     time.Time `db:"sign_date"`
+	CreatedAt    time.Time `db:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at"`
+}
+
 type SubscriberWithPassport struct {
 	ID                   int       `db:"id"`
 	AccountNumber        string    `db:"account_number"`

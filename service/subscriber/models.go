@@ -1,6 +1,9 @@
 package subscriber
 
-import "time"
+import (
+	"subscriber-service/service/object"
+	"time"
+)
 
 type Status int
 
@@ -25,6 +28,21 @@ type Subscriber struct {
 	Passport      Passport  `json:"Passport"`
 	CreatedAt     time.Time `json:"CreatedAt"`
 	UpdatedAt     time.Time `json:"UpdatedAt"`
+}
+
+type ExtendedSubscriber struct {
+	Subscriber Subscriber      `json:"Subscriber"`
+	Contracts  []Contract      `json:"Contracts"`
+	Objects    []object.Object `json:"Objects"`
+}
+
+type Contract struct {
+	ID        int       `json:"ID"`
+	Number    string    `json:"Number"`
+	ObjectID  int       `json:"ObjectID"`
+	SignDate  time.Time `json:"SignDate"`
+	CreatedAt time.Time `json:"CreatedAt"`
+	UpdatedAt time.Time `json:"UpdatedAt"`
 }
 
 type Passport struct {

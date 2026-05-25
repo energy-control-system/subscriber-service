@@ -66,6 +66,33 @@ func GetSubscriberByID(s *subscriber.Service) gorouter.Handler {
 	}
 }
 
+// GetSubscriberExtendedByID godoc
+// @Summary Get subscriber with contracts and objects
+// @Description Returns subscriber data with all related contracts and objects.
+// @Tags subscribers
+// @Produce json
+// @Param id path int true "Subscriber ID"
+// @Success 200 {object} subscriber.ExtendedSubscriber
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /subscribers/{id}/extended [get]
+func GetSubscriberExtendedByID(s *subscriber.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		var vars idVars
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read subscriber id: %w", err)
+		}
+
+		response, err := s.GetSubscriberExtendedByID(c.Ctx(), vars.ID)
+		if err != nil {
+			return fmt.Errorf("failed to get extended subscriber: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}
+
 // GetAllSubscribers godoc
 // @Summary List subscribers
 // @Description Returns all subscribers.

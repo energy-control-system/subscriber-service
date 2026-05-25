@@ -40,6 +40,7 @@ func (s *ServerBuilder) AddDebug() {
 func (s *ServerBuilder) AddSubscribers(service *subscriber.Service) {
 	r := s.router.SubRouter("/subscribers")
 	r.HandlePost("", handler.AddSubscriber(service))
+	r.HandleGet("/{id}/extended", handler.GetSubscriberExtendedByID(service))
 	r.HandleGet("/{id}", handler.GetSubscriberByID(service))
 	r.HandleGet("", handler.GetAllSubscribers(service))
 }

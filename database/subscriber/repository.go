@@ -6,6 +6,8 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	dbobject "subscriber-service/database/object"
+	"subscriber-service/service/object"
 	"subscriber-service/service/subscriber"
 
 	"github.com/jmoiron/sqlx"
@@ -26,8 +28,20 @@ var (
 	//go:embed sql/get_all_subscribers.sql
 	getAllSubscribersSQL string
 
+	//go:embed sql/get_contracts_by_subscriber_id.sql
+	getContractsBySubscriberIDSQL string
+
+	//go:embed sql/get_devices_by_object_ids.sql
+	getDevicesByObjectIDsSQL string
+
+	//go:embed sql/get_objects_by_ids.sql
+	getObjectsByIDsSQL string
+
 	//go:embed sql/get_passport_by_subscriber_id.sql
 	getPassportBySubscriberIDSQL string
+
+	//go:embed sql/get_seals_by_object_ids.sql
+	getSealsByObjectIDsSQL string
 
 	//go:embed sql/get_subscriber_by_id.sql
 	getSubscriberByIDSQL string
@@ -125,6 +139,93 @@ func (r *Repository) GetSubscriberByID(ctx context.Context, id int) (subscriber.
 	return newSubscriber, err
 }
 
+func (r *Repository) GetSubscriberExtendedByID(ctx context.Context, id int) (subscriber.ExtendedSubscriber, error) {
+	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return subscriber.ExtendedSubscriber{}, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	var dbSubscriber Subscriber
+	err = tx.GetContext(ctx, &dbSubscriber, getSubscriberByIDSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get subscriber: %w", err)
+		return subscriber.ExtendedSubscriber{}, err
+	}
+
+	var dbPassport Passport
+	err = tx.GetContext(ctx, &dbPassport, getPassportBySubscriberIDSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get passport: %w", err)
+		return subscriber.ExtendedSubscriber{}, err
+	}
+
+	var dbContracts []Contract
+	err = tx.SelectContext(ctx, &dbContracts, getContractsBySubscriberIDSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get contracts: %w", err)
+		return subscriber.ExtendedSubscriber{}, err
+	}
+
+	extendedSubscriber := subscriber.ExtendedSubscriber{
+		Subscriber: MapSubscriberFromDB(dbSubscriber, dbPassport),
+		Contracts:  MapContractsFromDB(dbContracts),
+		Objects:    []object.Object{},
+	}
+
+	objectIDs := uniqueContractObjectIDs(dbContracts)
+	if len(objectIDs) > 0 {
+		var dbObjects []dbobject.Object
+		err = tx.SelectContext(ctx, &dbObjects, getObjectsByIDsSQL, objectIDs)
+		if err != nil {
+			err = fmt.Errorf("get objects: %w", err)
+			return subscriber.ExtendedSubscriber{}, err
+		}
+
+		var dbDevices []dbobject.Device
+		err = tx.SelectContext(ctx, &dbDevices, getDevicesByObjectIDsSQL, objectIDs)
+		if err != nil {
+			err = fmt.Errorf("get object devices: %w", err)
+			return subscriber.ExtendedSubscriber{}, err
+		}
+
+		var dbSeals []dbobject.Seal
+		err = tx.SelectContext(ctx, &dbSeals, getSealsByObjectIDsSQL, objectIDs)
+		if err != nil {
+			err = fmt.Errorf("get object seals: %w", err)
+			return subscriber.ExtendedSubscriber{}, err
+		}
+
+		deviceMap := make(map[int][]dbobject.Device, len(dbObjects))
+		for _, dbDevice := range dbDevices {
+			deviceMap[dbDevice.ObjectID] = append(deviceMap[dbDevice.ObjectID], dbDevice)
+		}
+
+		extendedSubscriber.Objects = make([]object.Object, 0, len(dbObjects))
+		for _, dbObject := range dbObjects {
+			obj, mapErr := dbobject.MapObjectFullFromDB(dbObject, deviceMap[dbObject.ID], dbSeals)
+			if mapErr != nil {
+				err = fmt.Errorf("map object %d: %w", dbObject.ID, mapErr)
+				return subscriber.ExtendedSubscriber{}, err
+			}
+
+			extendedSubscriber.Objects = append(extendedSubscriber.Objects, obj)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return subscriber.ExtendedSubscriber{}, err
+	}
+
+	return extendedSubscriber, err
+}
+
 func (r *Repository) GetAllSubscribers(ctx context.Context, page pagination.Pagination) ([]subscriber.Subscriber, error) {
 	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
@@ -185,6 +286,21 @@ func (r *Repository) GetAllSubscribers(ctx context.Context, page pagination.Pagi
 	}
 
 	return subscribers, err
+}
+
+func uniqueContractObjectIDs(contracts []Contract) []int {
+	objectIDs := make([]int, 0, len(contracts))
+	seen := make(map[int]struct{}, len(contracts))
+	for _, c := range contracts {
+		if _, ok := seen[c.ObjectID]; ok {
+			continue
+		}
+
+		seen[c.ObjectID] = struct{}{}
+		objectIDs = append(objectIDs, c.ObjectID)
+	}
+
+	return objectIDs
 }
 
 func (r *Repository) UpdateSubscriberStatus(ctx context.Context, subscriberID int, newStatus subscriber.Status) error {

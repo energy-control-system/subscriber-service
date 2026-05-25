@@ -213,9 +213,10 @@ func TestValidateAccountNumber(t *testing.T) {
 
 // mockRepository is a test double for the Repository interface.
 type mockRepository struct {
-	addSubscriberFunc     func(ctx context.Context, request AddSubscriberRequest) (Subscriber, error)
-	getSubscriberByIDFunc func(ctx context.Context, id int) (Subscriber, error)
-	getAllSubscribersFunc func(ctx context.Context, page pagination.Pagination) ([]Subscriber, error)
+	addSubscriberFunc           func(ctx context.Context, request AddSubscriberRequest) (Subscriber, error)
+	getSubscriberByIDFunc       func(ctx context.Context, id int) (Subscriber, error)
+	getSubscriberExtendedIDFunc func(ctx context.Context, id int) (ExtendedSubscriber, error)
+	getAllSubscribersFunc       func(ctx context.Context, page pagination.Pagination) ([]Subscriber, error)
 }
 
 func (m *mockRepository) AddSubscriber(ctx context.Context, request AddSubscriberRequest) (Subscriber, error) {
@@ -230,6 +231,13 @@ func (m *mockRepository) GetSubscriberByID(ctx context.Context, id int) (Subscri
 		return m.getSubscriberByIDFunc(ctx, id)
 	}
 	return Subscriber{}, nil
+}
+
+func (m *mockRepository) GetSubscriberExtendedByID(ctx context.Context, id int) (ExtendedSubscriber, error) {
+	if m.getSubscriberExtendedIDFunc != nil {
+		return m.getSubscriberExtendedIDFunc(ctx, id)
+	}
+	return ExtendedSubscriber{}, nil
 }
 
 func (m *mockRepository) GetAllSubscribers(ctx context.Context, page pagination.Pagination) ([]Subscriber, error) {

@@ -224,6 +224,29 @@ const docTemplate = `{
                 },
                 "type": "object"
             },
+            "subscriber-service_service_subscriber.Contract": {
+                "properties": {
+                    "CreatedAt": {
+                        "type": "string"
+                    },
+                    "ID": {
+                        "type": "integer"
+                    },
+                    "Number": {
+                        "type": "string"
+                    },
+                    "ObjectID": {
+                        "type": "integer"
+                    },
+                    "SignDate": {
+                        "type": "string"
+                    },
+                    "UpdatedAt": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "subscriber-service_service_subscriber.Passport": {
                 "properties": {
                     "ID": {
@@ -333,6 +356,28 @@ const docTemplate = `{
                     },
                     "Series": {
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "subscriber.ExtendedSubscriber": {
+                "properties": {
+                    "Contracts": {
+                        "items": {
+                            "$ref": "#/components/schemas/subscriber-service_service_subscriber.Contract"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "Objects": {
+                        "items": {
+                            "$ref": "#/components/schemas/subscriber-service_service_object.Object"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "Subscriber": {
+                        "$ref": "#/components/schemas/subscriber-service_service_subscriber.Subscriber"
                     }
                 },
                 "type": "object"
@@ -1121,6 +1166,68 @@ const docTemplate = `{
                     }
                 },
                 "summary": "Get subscriber by ID",
+                "tags": [
+                    "subscribers"
+                ]
+            }
+        },
+        "/subscribers/{id}/extended": {
+            "get": {
+                "description": "Returns subscriber data with all related contracts and objects.",
+                "parameters": [
+                    {
+                        "description": "Subscriber ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/subscriber.ExtendedSubscriber"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "Get subscriber with contracts and objects",
                 "tags": [
                     "subscribers"
                 ]
