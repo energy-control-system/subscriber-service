@@ -13,7 +13,6 @@ import (
 // @Summary Create contract
 // @Description Creates a contract between subscriber and metering object.
 // @Tags contracts
-// @Accept json
 // @Produce json
 // @Param request body contract.AddContractRequest true "Contract creation payload"
 // @Success 200 {object} contract.Contract

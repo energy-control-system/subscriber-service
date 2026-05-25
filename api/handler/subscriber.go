@@ -13,7 +13,6 @@ import (
 // @Summary Create subscriber
 // @Description Creates a subscriber with passport data.
 // @Tags subscribers
-// @Accept json
 // @Produce json
 // @Param request body subscriber.AddSubscriberRequest true "Subscriber creation payload"
 // @Success 200 {object} subscriber.Subscriber

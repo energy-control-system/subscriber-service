@@ -283,11 +283,9 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-              - type: object
-              - $ref: '#/components/schemas/contract.AddContractRequest'
-                description: Contract creation payload
-                summary: request
+              $ref: '#/components/schemas/contract.AddContractRequest'
+              description: Contract creation payload
+              summary: request
         description: Contract creation payload
         required: true
       responses:
@@ -431,11 +429,9 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-              - type: object
-              - $ref: '#/components/schemas/object.AddObjectRequest'
-                description: Object creation payload
-                summary: request
+              $ref: '#/components/schemas/object.AddObjectRequest'
+              description: Object creation payload
+              summary: request
         description: Object creation payload
         required: true
       responses:
@@ -651,11 +647,9 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-              - type: object
-              - $ref: '#/components/schemas/subscriber.AddSubscriberRequest'
-                description: Subscriber creation payload
-                summary: request
+              $ref: '#/components/schemas/subscriber.AddSubscriberRequest'
+              description: Subscriber creation payload
+              summary: request
         description: Subscriber creation payload
         required: true
       responses:

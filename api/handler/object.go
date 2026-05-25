@@ -13,7 +13,6 @@ import (
 // @Summary Create metering object
 // @Description Creates a metering object with devices and seals.
 // @Tags objects
-// @Accept json
 // @Produce json
 // @Param request body object.AddObjectRequest true "Object creation payload"
 // @Success 200 {object} object.Object

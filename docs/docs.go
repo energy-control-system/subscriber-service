@@ -431,16 +431,9 @@ const docTemplate = `{
                     "content": {
                         "application/json": {
                             "schema": {
-                                "oneOf": [
-                                    {
-                                        "type": "object"
-                                    },
-                                    {
-                                        "$ref": "#/components/schemas/contract.AddContractRequest",
-                                        "summary": "request",
-                                        "description": "Contract creation payload"
-                                    }
-                                ]
+                                "$ref": "#/components/schemas/contract.AddContractRequest",
+                                "summary": "request",
+                                "description": "Contract creation payload"
                             }
                         }
                     },
@@ -673,16 +666,9 @@ const docTemplate = `{
                     "content": {
                         "application/json": {
                             "schema": {
-                                "oneOf": [
-                                    {
-                                        "type": "object"
-                                    },
-                                    {
-                                        "$ref": "#/components/schemas/object.AddObjectRequest",
-                                        "summary": "request",
-                                        "description": "Object creation payload"
-                                    }
-                                ]
+                                "$ref": "#/components/schemas/object.AddObjectRequest",
+                                "summary": "request",
+                                "description": "Object creation payload"
                             }
                         }
                     },
@@ -1031,16 +1017,9 @@ const docTemplate = `{
                     "content": {
                         "application/json": {
                             "schema": {
-                                "oneOf": [
-                                    {
-                                        "type": "object"
-                                    },
-                                    {
-                                        "$ref": "#/components/schemas/subscriber.AddSubscriberRequest",
-                                        "summary": "request",
-                                        "description": "Subscriber creation payload"
-                                    }
-                                ]
+                                "$ref": "#/components/schemas/subscriber.AddSubscriberRequest",
+                                "summary": "request",
+                                "description": "Subscriber creation payload"
                             }
                         }
                     },
