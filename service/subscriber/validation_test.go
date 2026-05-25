@@ -216,7 +216,7 @@ type mockRepository struct {
 	addSubscriberFunc           func(ctx context.Context, request AddSubscriberRequest) (Subscriber, error)
 	getSubscriberByIDFunc       func(ctx context.Context, id int) (Subscriber, error)
 	getSubscriberExtendedIDFunc func(ctx context.Context, id int) (ExtendedSubscriber, error)
-	getAllSubscribersFunc       func(ctx context.Context, page pagination.Pagination) ([]Subscriber, error)
+	getAllSubscribersFunc       func(ctx context.Context, page pagination.Pagination, filter ListFilter) ([]Subscriber, error)
 }
 
 func (m *mockRepository) AddSubscriber(ctx context.Context, request AddSubscriberRequest) (Subscriber, error) {
@@ -240,9 +240,9 @@ func (m *mockRepository) GetSubscriberExtendedByID(ctx context.Context, id int) 
 	return ExtendedSubscriber{}, nil
 }
 
-func (m *mockRepository) GetAllSubscribers(ctx context.Context, page pagination.Pagination) ([]Subscriber, error) {
+func (m *mockRepository) GetAllSubscribers(ctx context.Context, page pagination.Pagination, filter ListFilter) ([]Subscriber, error) {
 	if m.getAllSubscribersFunc != nil {
-		return m.getAllSubscribersFunc(ctx, page)
+		return m.getAllSubscribersFunc(ctx, page, filter)
 	}
 	return nil, nil
 }

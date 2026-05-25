@@ -48,12 +48,12 @@ func (s *Service) GetSubscriberExtendedByID(ctx goctx.Context, id int) (Extended
 	return subscriber, nil
 }
 
-func (s *Service) GetAllSubscribers(ctx goctx.Context, page pagination.Pagination) ([]Subscriber, error) {
+func (s *Service) GetAllSubscribers(ctx goctx.Context, page pagination.Pagination, filter ListFilter) ([]Subscriber, error) {
 	if err := page.Validate(); err != nil {
 		return nil, fmt.Errorf("validate pagination: %w", err)
 	}
 
-	subscribers, err := s.repository.GetAllSubscribers(ctx, page)
+	subscribers, err := s.repository.GetAllSubscribers(ctx, page, filter)
 	if err != nil {
 		return nil, fmt.Errorf("get all subscribers from repository: %w", err)
 	}

@@ -100,18 +100,44 @@ func GetSubscriberExtendedByID(s *subscriber.Service) gorouter.Handler {
 // @Produce json
 // @Param limit query int false "Maximum number of items to return; 0 means no limit"
 // @Param offset query int false "Number of items to skip"
+// @Param surname query string false "Search by subscriber surname"
+// @Param name query string false "Search by subscriber name"
+// @Param patronymic query string false "Search by subscriber patronymic"
+// @Param accountNumber query string false "Search by subscriber account number"
+// @Param phoneNumber query string false "Search by subscriber phone number"
+// @Param address query string false "Search by metering object address"
 // @Success 200 {array} subscriber.Subscriber
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
 // @Router /subscribers [get]
 func GetAllSubscribers(s *subscriber.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
-		var vars pagination.Pagination
+		var vars struct {
+			Limit         int    `query:"limit"`
+			Offset        int    `query:"offset"`
+			Surname       string `query:"surname"`
+			Name          string `query:"name"`
+			Patronymic    string `query:"patronymic"`
+			AccountNumber string `query:"accountNumber"`
+			PhoneNumber   string `query:"phoneNumber"`
+			Address       string `query:"address"`
+		}
 		if err := c.Vars(&vars); err != nil {
-			return fmt.Errorf("failed to read pagination: %w", err)
+			return fmt.Errorf("failed to read list params: %w", err)
 		}
 
-		response, err := s.GetAllSubscribers(c.Ctx(), vars)
+		response, err := s.GetAllSubscribers(
+			c.Ctx(),
+			pagination.Pagination{Limit: vars.Limit, Offset: vars.Offset},
+			subscriber.ListFilter{
+				Surname:       vars.Surname,
+				Name:          vars.Name,
+				Patronymic:    vars.Patronymic,
+				AccountNumber: vars.AccountNumber,
+				PhoneNumber:   vars.PhoneNumber,
+				Address:       vars.Address,
+			},
+		)
 		if err != nil {
 			return fmt.Errorf("failed to get all subscribers: %w", err)
 		}

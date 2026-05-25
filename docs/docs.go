@@ -1014,6 +1014,54 @@ const docTemplate = `{
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "description": "Search by subscriber surname",
+                        "in": "query",
+                        "name": "surname",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Search by subscriber name",
+                        "in": "query",
+                        "name": "name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Search by subscriber patronymic",
+                        "in": "query",
+                        "name": "patronymic",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Search by subscriber account number",
+                        "in": "query",
+                        "name": "accountNumber",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Search by subscriber phone number",
+                        "in": "query",
+                        "name": "phoneNumber",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Search by metering object address",
+                        "in": "query",
+                        "name": "address",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {

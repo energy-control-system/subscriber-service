@@ -226,7 +226,7 @@ func (r *Repository) GetSubscriberExtendedByID(ctx context.Context, id int) (sub
 	return extendedSubscriber, err
 }
 
-func (r *Repository) GetAllSubscribers(ctx context.Context, page pagination.Pagination) ([]subscriber.Subscriber, error) {
+func (r *Repository) GetAllSubscribers(ctx context.Context, page pagination.Pagination, filter subscriber.ListFilter) ([]subscriber.Subscriber, error) {
 	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
 		return nil, fmt.Errorf("begin transaction: %w", err)
@@ -238,7 +238,19 @@ func (r *Repository) GetAllSubscribers(ctx context.Context, page pagination.Pagi
 	}()
 
 	var dbSubscribers []Subscriber
-	err = tx.SelectContext(ctx, &dbSubscribers, getAllSubscribersSQL, page.LimitArg(), page.Offset)
+	err = tx.SelectContext(
+		ctx,
+		&dbSubscribers,
+		getAllSubscribersSQL,
+		filter.Surname,
+		filter.Name,
+		filter.Patronymic,
+		filter.AccountNumber,
+		filter.PhoneNumber,
+		filter.Address,
+		page.LimitArg(),
+		page.Offset,
+	)
 	if err != nil {
 		err = fmt.Errorf("get all subscribers: %w", err)
 		return nil, err

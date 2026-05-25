@@ -36,6 +36,15 @@ type ExtendedSubscriber struct {
 	Objects    []object.Object `json:"Objects"`
 }
 
+type ListFilter struct {
+	Surname       string
+	Name          string
+	Patronymic    string
+	AccountNumber string
+	PhoneNumber   string
+	Address       string
+}
+
 type Contract struct {
 	ID        int       `json:"ID"`
 	Number    string    `json:"Number"`
