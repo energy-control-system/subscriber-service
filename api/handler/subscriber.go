@@ -101,6 +101,7 @@ func GetSubscriberExtendedByID(s *subscriber.Service) gorouter.Handler {
 // @Param limit query int false "Maximum number of items to return; 0 means no limit"
 // @Param offset query int false "Number of items to skip"
 // @Param search query string false "Search by surname, name, patronymic, account number, phone number, or address"
+// @Param status query int false "Filter by subscriber status; 0 means all statuses"
 // @Success 200 {array} subscriber.Subscriber
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
@@ -111,6 +112,7 @@ func GetAllSubscribers(s *subscriber.Service) gorouter.Handler {
 			Limit  int    `query:"limit"`
 			Offset int    `query:"offset"`
 			Search string `query:"search"`
+			Status int    `query:"status"`
 		}
 		if err := c.Vars(&vars); err != nil {
 			return fmt.Errorf("failed to read list params: %w", err)
@@ -121,6 +123,7 @@ func GetAllSubscribers(s *subscriber.Service) gorouter.Handler {
 			pagination.Pagination{Limit: vars.Limit, Offset: vars.Offset},
 			subscriber.ListFilter{
 				Search: vars.Search,
+				Status: subscriber.Status(vars.Status),
 			},
 		)
 		if err != nil {

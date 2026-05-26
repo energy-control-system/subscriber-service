@@ -1022,6 +1022,14 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "description": "Filter by subscriber status; 0 means all statuses",
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "integer"
+                        }
                     }
                 ],
                 "responses": {

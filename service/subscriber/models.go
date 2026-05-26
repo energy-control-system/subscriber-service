@@ -38,6 +38,7 @@ type ExtendedSubscriber struct {
 
 type ListFilter struct {
 	Search string
+	Status Status
 }
 
 type Contract struct {

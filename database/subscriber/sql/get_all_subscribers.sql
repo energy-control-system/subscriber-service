@@ -22,5 +22,6 @@ where ($1 = ''
                         join objects o on o.id = c.object_id
                where c.subscriber_id = s.id
                  and o.address ilike '%' || $1 || '%'))
+  and ($2 = 0 or s.status = $2)
 order by id
-limit $2 offset $3;
+limit $3 offset $4;

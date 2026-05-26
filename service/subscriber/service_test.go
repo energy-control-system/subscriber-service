@@ -60,7 +60,7 @@ func TestGetAllSubscribersDelegatesPaginationAndSearchFilter(t *testing.T) {
 	repository := &extendedMockRepository{}
 	service := NewService(repository)
 
-	filter := ListFilter{Search: "Иван"}
+	filter := ListFilter{Search: "Иван", Status: StatusActive}
 	page := pagination.Pagination{Limit: 20, Offset: 40}
 
 	got, err := service.GetAllSubscribers(goctx.Wrap(context.Background()), page, filter)
