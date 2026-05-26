@@ -35,6 +35,12 @@ type UpsertObjectRequest struct {
 	HaveAutomaton bool   `db:"have_automaton"`
 }
 
+type UpdateObjectRequest struct {
+	ID            int    `db:"id"`
+	Address       string `db:"address"`
+	HaveAutomaton bool   `db:"have_automaton"`
+}
+
 type UpsertDeviceRequest struct {
 	ObjectAddress    string `db:"object_address"`
 	Type             string `db:"type"`

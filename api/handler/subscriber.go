@@ -133,3 +133,63 @@ func GetAllSubscribers(s *subscriber.Service) gorouter.Handler {
 		return c.WriteJson(http.StatusOK, response)
 	}
 }
+
+// UpdateSubscriber godoc
+// @Summary Update subscriber
+// @Description Updates subscriber and passport data.
+// @Tags subscribers
+// @Produce json
+// @Param id path int true "Subscriber ID"
+// @Param request body subscriber.UpdateSubscriberRequest true "Subscriber update payload"
+// @Success 200 {object} subscriber.Subscriber
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /subscribers/{id} [patch]
+func UpdateSubscriber(s *subscriber.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		var vars idVars
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read subscriber id: %w", err)
+		}
+
+		var request subscriber.UpdateSubscriberRequest
+		if err := c.ReadJson(&request); err != nil {
+			return fmt.Errorf("failed to read update subscriber request: %w", err)
+		}
+
+		response, err := s.UpdateSubscriber(c.Ctx(), vars.ID, request)
+		if err != nil {
+			return fmt.Errorf("failed to update subscriber: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}
+
+// DeleteSubscriber godoc
+// @Summary Delete subscriber
+// @Description Deletes subscriber and passport data by identifier.
+// @Tags subscribers
+// @Produce json
+// @Param id path int true "Subscriber ID"
+// @Success 200 {object} subscriber.Subscriber
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /subscribers/{id} [delete]
+func DeleteSubscriber(s *subscriber.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		var vars idVars
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read subscriber id: %w", err)
+		}
+
+		response, err := s.DeleteSubscriber(c.Ctx(), vars.ID)
+		if err != nil {
+			return fmt.Errorf("failed to delete subscriber: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}

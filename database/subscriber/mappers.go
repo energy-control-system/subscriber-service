@@ -66,6 +66,30 @@ func MapUpsertSubscriberRequestsToDB(requests []subscriber.UpsertSubscriberReque
 	return result, nil
 }
 
+func MapUpdateSubscriberRequestToDB(id int, request subscriber.UpdateSubscriberRequest) (UpdateSubscriberRequest, error) {
+	birthDate, err := time.ParseInLocation(time.DateOnly, request.BirthDate, time.UTC)
+	if err != nil {
+		return UpdateSubscriberRequest{}, fmt.Errorf("parse birth date: %w", err)
+	}
+
+	return UpdateSubscriberRequest{
+		ID:                id,
+		AccountNumber:     request.AccountNumber,
+		Surname:           request.Surname,
+		Name:              request.Name,
+		Patronymic:        request.Patronymic,
+		PhoneNumber:       request.PhoneNumber,
+		Email:             request.Email,
+		INN:               request.INN,
+		BirthDate:         birthDate,
+		Status:            int(request.Status),
+		PassportSeries:    request.Passport.Series,
+		PassportNumber:    request.Passport.Number,
+		PassportIssuedBy:  request.Passport.IssuedBy,
+		PassportIssueDate: request.Passport.IssueDate,
+	}, nil
+}
+
 func MapSubscriberFromDB(s Subscriber, p Passport) subscriber.Subscriber {
 	return subscriber.Subscriber{
 		ID:            s.ID,

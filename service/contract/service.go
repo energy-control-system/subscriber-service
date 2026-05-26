@@ -71,6 +71,24 @@ func (s *Service) GetLastContractsByObjectIDs(ctx goctx.Context, objectIDs []int
 	return contracts, nil
 }
 
+func (s *Service) UpdateContract(ctx goctx.Context, id int, request UpdateContractRequest) (Contract, error) {
+	c, err := s.repository.UpdateContract(ctx, id, request)
+	if err != nil {
+		return Contract{}, fmt.Errorf("update contract in repository: %w", err)
+	}
+
+	return c, nil
+}
+
+func (s *Service) DeleteContract(ctx goctx.Context, id int) (Contract, error) {
+	c, err := s.repository.DeleteContract(ctx, id)
+	if err != nil {
+		return Contract{}, fmt.Errorf("delete contract from repository: %w", err)
+	}
+
+	return c, nil
+}
+
 func (s *Service) SubscriberOnInspectionEvent(mainCtx context.Context, log golog.Logger) gokafka.Subscriber {
 	return func(message gokafka.Message, err error) {
 		ctx, cancel := context.WithTimeout(mainCtx, kafkaSubscribeTimeout)

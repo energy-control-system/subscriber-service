@@ -29,3 +29,10 @@ type UpsertContractRequest struct {
 	ObjectAddress           string `json:"ObjectAddress"`
 	SignDate                string `json:"SignDate"`
 }
+
+type UpdateContractRequest struct {
+	Number       string `json:"Number"`
+	SubscriberID int    `json:"SubscriberID"`
+	ObjectID     int    `json:"ObjectID"`
+	SignDate     string `json:"SignDate"`
+}

@@ -37,6 +37,14 @@ func MapUpsertObjectRequestsToDB(requests []object.UpsertObjectRequest) []Upsert
 	return result
 }
 
+func MapUpdateObjectRequestToDB(id int, request object.UpdateObjectRequest) UpdateObjectRequest {
+	return UpdateObjectRequest{
+		ID:            id,
+		Address:       request.Address,
+		HaveAutomaton: request.HaveAutomaton,
+	}
+}
+
 func MapAddObjectRequestDeviceToDB(d object.AddObjectRequestDevice, objectID int) Device {
 	return Device{
 		ObjectID:         objectID,

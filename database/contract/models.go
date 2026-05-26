@@ -18,3 +18,11 @@ type UpsertContractRequest struct {
 	ObjectAddress           string `db:"object_address"`
 	SignDate                string `db:"sign_date"`
 }
+
+type UpdateContractRequest struct {
+	ID           int       `db:"id"`
+	Number       string    `db:"number"`
+	SubscriberID int       `db:"subscriber_id"`
+	ObjectID     int       `db:"object_id"`
+	SignDate     time.Time `db:"sign_date"`
+}

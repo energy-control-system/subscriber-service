@@ -150,3 +150,63 @@ func GetAllObjects(s *object.Service) gorouter.Handler {
 		return c.WriteJson(http.StatusOK, response)
 	}
 }
+
+// UpdateObject godoc
+// @Summary Update metering object
+// @Description Updates a metering object's main data.
+// @Tags objects
+// @Produce json
+// @Param id path int true "Object ID"
+// @Param request body object.UpdateObjectRequest true "Object update payload"
+// @Success 200 {object} object.Object
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /objects/{id} [patch]
+func UpdateObject(s *object.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		var vars idVars
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read object id: %w", err)
+		}
+
+		var request object.UpdateObjectRequest
+		if err := c.ReadJson(&request); err != nil {
+			return fmt.Errorf("failed to read update object request: %w", err)
+		}
+
+		response, err := s.UpdateObject(c.Ctx(), vars.ID, request)
+		if err != nil {
+			return fmt.Errorf("failed to update object: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}
+
+// DeleteObject godoc
+// @Summary Delete metering object
+// @Description Deletes a metering object by identifier.
+// @Tags objects
+// @Produce json
+// @Param id path int true "Object ID"
+// @Success 200 {object} object.Object
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /objects/{id} [delete]
+func DeleteObject(s *object.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		var vars idVars
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read object id: %w", err)
+		}
+
+		response, err := s.DeleteObject(c.Ctx(), vars.ID)
+		if err != nil {
+			return fmt.Errorf("failed to delete object: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}

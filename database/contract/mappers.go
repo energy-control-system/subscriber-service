@@ -47,3 +47,18 @@ func MapUpsertContractRequestsToDB(requests []contract.UpsertContractRequest) []
 
 	return result
 }
+
+func MapUpdateContractRequestToDB(id int, request contract.UpdateContractRequest) (UpdateContractRequest, error) {
+	signDate, err := time.ParseInLocation(time.DateOnly, request.SignDate, time.UTC)
+	if err != nil {
+		return UpdateContractRequest{}, fmt.Errorf("parse sign date: %w", err)
+	}
+
+	return UpdateContractRequest{
+		ID:           id,
+		Number:       request.Number,
+		SubscriberID: request.SubscriberID,
+		ObjectID:     request.ObjectID,
+		SignDate:     signDate,
+	}, nil
+}

@@ -122,3 +122,63 @@ func GetLastContractByObjectID(s *contract.Service) gorouter.Handler {
 		return c.WriteJson(http.StatusOK, response)
 	}
 }
+
+// UpdateContract godoc
+// @Summary Update contract
+// @Description Updates contract data and relations.
+// @Tags contracts
+// @Produce json
+// @Param id path int true "Contract ID"
+// @Param request body contract.UpdateContractRequest true "Contract update payload"
+// @Success 200 {object} contract.Contract
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /contracts/{id} [patch]
+func UpdateContract(s *contract.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		var vars idVars
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read contract id: %w", err)
+		}
+
+		var request contract.UpdateContractRequest
+		if err := c.ReadJson(&request); err != nil {
+			return fmt.Errorf("failed to read update contract request: %w", err)
+		}
+
+		response, err := s.UpdateContract(c.Ctx(), vars.ID, request)
+		if err != nil {
+			return fmt.Errorf("failed to update contract: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}
+
+// DeleteContract godoc
+// @Summary Delete contract
+// @Description Deletes a contract by identifier.
+// @Tags contracts
+// @Produce json
+// @Param id path int true "Contract ID"
+// @Success 200 {object} contract.Contract
+// @Failure 400 {object} gorouter.ErrorResponse
+// @Failure 404 {object} gorouter.ErrorResponse
+// @Failure 500 {object} gorouter.ErrorResponse
+// @Router /contracts/{id} [delete]
+func DeleteContract(s *contract.Service) gorouter.Handler {
+	return func(c gorouter.Context) error {
+		var vars idVars
+		if err := c.Vars(&vars); err != nil {
+			return fmt.Errorf("failed to read contract id: %w", err)
+		}
+
+		response, err := s.DeleteContract(c.Ctx(), vars.ID)
+		if err != nil {
+			return fmt.Errorf("failed to delete contract: %w", err)
+		}
+
+		return c.WriteJson(http.StatusOK, response)
+	}
+}

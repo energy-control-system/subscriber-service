@@ -138,6 +138,23 @@ const docTemplate = `{
                 },
                 "type": "object"
             },
+            "subscriber-service_service_contract.UpdateContractRequest": {
+                "properties": {
+                    "Number": {
+                        "type": "string"
+                    },
+                    "ObjectID": {
+                        "type": "integer"
+                    },
+                    "SignDate": {
+                        "type": "string"
+                    },
+                    "SubscriberID": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "subscriber-service_service_object.Device": {
                 "properties": {
                     "CreatedAt": {
@@ -220,6 +237,17 @@ const docTemplate = `{
                     },
                     "UpdatedAt": {
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "subscriber-service_service_object.UpdateObjectRequest": {
+                "properties": {
+                    "Address": {
+                        "type": "string"
+                    },
+                    "HaveAutomaton": {
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
@@ -311,6 +339,41 @@ const docTemplate = `{
                 },
                 "type": "object"
             },
+            "subscriber-service_service_subscriber.UpdateSubscriberRequest": {
+                "properties": {
+                    "AccountNumber": {
+                        "type": "string"
+                    },
+                    "BirthDate": {
+                        "type": "string"
+                    },
+                    "Email": {
+                        "type": "string"
+                    },
+                    "INN": {
+                        "type": "string"
+                    },
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Passport": {
+                        "$ref": "#/components/schemas/subscriber.UpdateSubscriberRequestPassport"
+                    },
+                    "Patronymic": {
+                        "type": "string"
+                    },
+                    "PhoneNumber": {
+                        "type": "string"
+                    },
+                    "Status": {
+                        "$ref": "#/components/schemas/subscriber.Status"
+                    },
+                    "Surname": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "subscriber.AddSubscriberRequest": {
                 "properties": {
                     "AccountNumber": {
@@ -396,6 +459,23 @@ const docTemplate = `{
                     "StatusViolator",
                     "StatusArchived"
                 ]
+            },
+            "subscriber.UpdateSubscriberRequestPassport": {
+                "properties": {
+                    "IssueDate": {
+                        "type": "string"
+                    },
+                    "IssuedBy": {
+                        "type": "string"
+                    },
+                    "Number": {
+                        "type": "string"
+                    },
+                    "Series": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
             }
         }
     },
@@ -644,6 +724,141 @@ const docTemplate = `{
                 ]
             }
         },
+        "/contracts/{id}": {
+            "delete": {
+                "description": "Deletes a contract by identifier.",
+                "parameters": [
+                    {
+                        "description": "Contract ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/subscriber-service_service_contract.Contract"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "Delete contract",
+                "tags": [
+                    "contracts"
+                ]
+            },
+            "patch": {
+                "description": "Updates contract data and relations.",
+                "parameters": [
+                    {
+                        "description": "Contract ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/subscriber-service_service_contract.UpdateContractRequest",
+                                "summary": "request",
+                                "description": "Contract update payload"
+                            }
+                        }
+                    },
+                    "description": "Contract update payload",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/subscriber-service_service_contract.Contract"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "Update contract",
+                "tags": [
+                    "contracts"
+                ]
+            }
+        },
         "/objects": {
             "get": {
                 "description": "Returns all metering objects.",
@@ -883,6 +1098,66 @@ const docTemplate = `{
             }
         },
         "/objects/{id}": {
+            "delete": {
+                "description": "Deletes a metering object by identifier.",
+                "parameters": [
+                    {
+                        "description": "Object ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/subscriber-service_service_object.Object"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "Delete metering object",
+                "tags": [
+                    "objects"
+                ]
+            },
             "get": {
                 "description": "Returns a metering object by identifier.",
                 "parameters": [
@@ -939,6 +1214,79 @@ const docTemplate = `{
                     }
                 },
                 "summary": "Get object by ID",
+                "tags": [
+                    "objects"
+                ]
+            },
+            "patch": {
+                "description": "Updates a metering object's main data.",
+                "parameters": [
+                    {
+                        "description": "Object ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/subscriber-service_service_object.UpdateObjectRequest",
+                                "summary": "request",
+                                "description": "Object update payload"
+                            }
+                        }
+                    },
+                    "description": "Object update payload",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/subscriber-service_service_object.Object"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "Update metering object",
                 "tags": [
                     "objects"
                 ]
@@ -1126,6 +1474,66 @@ const docTemplate = `{
             }
         },
         "/subscribers/{id}": {
+            "delete": {
+                "description": "Deletes subscriber and passport data by identifier.",
+                "parameters": [
+                    {
+                        "description": "Subscriber ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/subscriber-service_service_subscriber.Subscriber"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "Delete subscriber",
+                "tags": [
+                    "subscribers"
+                ]
+            },
             "get": {
                 "description": "Returns subscriber data by identifier.",
                 "parameters": [
@@ -1182,6 +1590,79 @@ const docTemplate = `{
                     }
                 },
                 "summary": "Get subscriber by ID",
+                "tags": [
+                    "subscribers"
+                ]
+            },
+            "patch": {
+                "description": "Updates subscriber and passport data.",
+                "parameters": [
+                    {
+                        "description": "Subscriber ID",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/subscriber-service_service_subscriber.UpdateSubscriberRequest",
+                                "summary": "request",
+                                "description": "Subscriber update payload"
+                            }
+                        }
+                    },
+                    "description": "Subscriber update payload",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/subscriber-service_service_subscriber.Subscriber"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gorouter.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal Server Error"
+                    }
+                },
+                "summary": "Update subscriber",
                 "tags": [
                     "subscribers"
                 ]

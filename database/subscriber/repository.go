@@ -22,6 +22,9 @@ var (
 	//go:embed sql/add_subscriber.sql
 	addSubscriberSQL string
 
+	//go:embed sql/delete_subscriber.sql
+	deleteSubscriberSQL string
+
 	//go:embed sql/get_all_passports.sql
 	getAllPassportsSQL string
 
@@ -48,6 +51,12 @@ var (
 
 	//go:embed sql/update_subscriber_status.sql
 	updateSubscriberStatusSQL string
+
+	//go:embed sql/update_passport.sql
+	updatePassportSQL string
+
+	//go:embed sql/update_subscriber.sql
+	updateSubscriberSQL string
 
 	//go:embed sql/upsert_subscriber.sql
 	upsertSubscriberSQL string
@@ -294,6 +303,99 @@ func (r *Repository) GetAllSubscribers(ctx context.Context, page pagination.Pagi
 	}
 
 	return subscribers, err
+}
+
+func (r *Repository) UpdateSubscriber(ctx context.Context, id int, request subscriber.UpdateSubscriberRequest) (subscriber.Subscriber, error) {
+	dbRequest, err := MapUpdateSubscriberRequestToDB(id, request)
+	if err != nil {
+		return subscriber.Subscriber{}, fmt.Errorf("map update subscriber request: %w", err)
+	}
+
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return subscriber.Subscriber{}, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	var dbSubscriber Subscriber
+	err = db.NamedGet(tx, &dbSubscriber, updateSubscriberSQL, dbRequest)
+	if err != nil {
+		err = fmt.Errorf("update subscriber: %w", err)
+		return subscriber.Subscriber{}, err
+	}
+
+	var dbPassport Passport
+	err = db.NamedGet(tx, &dbPassport, updatePassportSQL, dbRequest)
+	if err != nil {
+		err = fmt.Errorf("update passport: %w", err)
+		return subscriber.Subscriber{}, err
+	}
+
+	updatedSubscriber := MapSubscriberFromDB(dbSubscriber, dbPassport)
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return subscriber.Subscriber{}, err
+	}
+
+	return updatedSubscriber, nil
+}
+
+func (r *Repository) DeleteSubscriber(ctx context.Context, id int) (subscriber.Subscriber, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return subscriber.Subscriber{}, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	var dbSubscriber Subscriber
+	err = tx.GetContext(ctx, &dbSubscriber, getSubscriberByIDSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get subscriber: %w", err)
+		return subscriber.Subscriber{}, err
+	}
+
+	var dbPassport Passport
+	err = tx.GetContext(ctx, &dbPassport, getPassportBySubscriberIDSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get passport: %w", err)
+		return subscriber.Subscriber{}, err
+	}
+
+	result, err := tx.ExecContext(ctx, deleteSubscriberSQL, id)
+	if err != nil {
+		err = fmt.Errorf("delete subscriber: %w", err)
+		return subscriber.Subscriber{}, err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		err = fmt.Errorf("get rows affected: %w", err)
+		return subscriber.Subscriber{}, err
+	}
+	if rows != 1 {
+		err = fmt.Errorf("rows affected = %d, expected 1", rows)
+		return subscriber.Subscriber{}, err
+	}
+
+	deletedSubscriber := MapSubscriberFromDB(dbSubscriber, dbPassport)
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return subscriber.Subscriber{}, err
+	}
+
+	return deletedSubscriber, nil
 }
 
 func uniqueContractObjectIDs(contracts []Contract) []int {

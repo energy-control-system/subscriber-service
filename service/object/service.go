@@ -65,3 +65,21 @@ func (s *Service) GetAllObjects(ctx goctx.Context, page pagination.Pagination) (
 
 	return objects, nil
 }
+
+func (s *Service) UpdateObject(ctx goctx.Context, id int, request UpdateObjectRequest) (Object, error) {
+	obj, err := s.repository.UpdateObject(ctx, id, request)
+	if err != nil {
+		return Object{}, fmt.Errorf("update object in repository: %w", err)
+	}
+
+	return obj, nil
+}
+
+func (s *Service) DeleteObject(ctx goctx.Context, id int) (Object, error) {
+	obj, err := s.repository.DeleteObject(ctx, id)
+	if err != nil {
+		return Object{}, fmt.Errorf("delete object from repository: %w", err)
+	}
+
+	return obj, nil
+}

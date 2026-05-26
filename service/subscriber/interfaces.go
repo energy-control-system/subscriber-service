@@ -11,4 +11,6 @@ type Repository interface {
 	GetSubscriberByID(ctx context.Context, id int) (Subscriber, error)
 	GetSubscriberExtendedByID(ctx context.Context, id int) (ExtendedSubscriber, error)
 	GetAllSubscribers(ctx context.Context, page pagination.Pagination, filter ListFilter) ([]Subscriber, error)
+	UpdateSubscriber(ctx context.Context, id int, request UpdateSubscriberRequest) (Subscriber, error)
+	DeleteSubscriber(ctx context.Context, id int) (Subscriber, error)
 }

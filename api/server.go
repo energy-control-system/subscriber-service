@@ -42,6 +42,8 @@ func (s *ServerBuilder) AddSubscribers(service *subscriber.Service) {
 	r.HandlePost("", handler.AddSubscriber(service))
 	r.HandleGet("/{id}/extended", handler.GetSubscriberExtendedByID(service))
 	r.HandleGet("/{id}", handler.GetSubscriberByID(service))
+	r.HandlePatch("/{id}", handler.UpdateSubscriber(service))
+	r.HandleDelete("/{id}", handler.DeleteSubscriber(service))
 	r.HandleGet("", handler.GetAllSubscribers(service))
 }
 
@@ -49,6 +51,8 @@ func (s *ServerBuilder) AddObjects(service *object.Service) {
 	r := s.router.SubRouter("/objects")
 	r.HandlePost("", handler.AddObject(service))
 	r.HandleGet("/{id}", handler.GetObjectByID(service))
+	r.HandlePatch("/{id}", handler.UpdateObject(service))
+	r.HandleDelete("/{id}", handler.DeleteObject(service))
 	r.HandleGet("/devices/{deviceID}", handler.GetObjectByDeviceID(service))
 	r.HandleGet("/seals/{sealID}", handler.GetObjectBySealID(service))
 	r.HandleGet("", handler.GetAllObjects(service))
@@ -58,6 +62,8 @@ func (s *ServerBuilder) AddContracts(service *contract.Service) {
 	r := s.router.SubRouter("/contracts")
 	r.HandlePost("", handler.AddContract(service))
 	r.HandleGet("", handler.GetAllContracts(service))
+	r.HandlePatch("/{id}", handler.UpdateContract(service))
+	r.HandleDelete("/{id}", handler.DeleteContract(service))
 	r.HandleGet("/objects/last", handler.GetLastContractsByObjectIDs(service))
 	r.HandleGet("/objects/{objectID}/last", handler.GetLastContractByObjectID(service))
 }

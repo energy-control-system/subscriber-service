@@ -217,6 +217,8 @@ type mockRepository struct {
 	getSubscriberByIDFunc       func(ctx context.Context, id int) (Subscriber, error)
 	getSubscriberExtendedIDFunc func(ctx context.Context, id int) (ExtendedSubscriber, error)
 	getAllSubscribersFunc       func(ctx context.Context, page pagination.Pagination, filter ListFilter) ([]Subscriber, error)
+	updateSubscriberFunc        func(ctx context.Context, id int, request UpdateSubscriberRequest) (Subscriber, error)
+	deleteSubscriberFunc        func(ctx context.Context, id int) (Subscriber, error)
 }
 
 func (m *mockRepository) AddSubscriber(ctx context.Context, request AddSubscriberRequest) (Subscriber, error) {
@@ -245,6 +247,20 @@ func (m *mockRepository) GetAllSubscribers(ctx context.Context, page pagination.
 		return m.getAllSubscribersFunc(ctx, page, filter)
 	}
 	return nil, nil
+}
+
+func (m *mockRepository) UpdateSubscriber(ctx context.Context, id int, request UpdateSubscriberRequest) (Subscriber, error) {
+	if m.updateSubscriberFunc != nil {
+		return m.updateSubscriberFunc(ctx, id, request)
+	}
+	return Subscriber{ID: id, AccountNumber: request.AccountNumber}, nil
+}
+
+func (m *mockRepository) DeleteSubscriber(ctx context.Context, id int) (Subscriber, error) {
+	if m.deleteSubscriberFunc != nil {
+		return m.deleteSubscriberFunc(ctx, id)
+	}
+	return Subscriber{ID: id}, nil
 }
 
 func TestAddSubscriber_ValidAccountNumber(t *testing.T) {

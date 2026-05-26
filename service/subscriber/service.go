@@ -60,3 +60,25 @@ func (s *Service) GetAllSubscribers(ctx goctx.Context, page pagination.Paginatio
 
 	return subscribers, nil
 }
+
+func (s *Service) UpdateSubscriber(ctx goctx.Context, id int, request UpdateSubscriberRequest) (Subscriber, error) {
+	if err := ValidateAccountNumber(request.AccountNumber); err != nil {
+		return Subscriber{}, fmt.Errorf("validate account number: %w", err)
+	}
+
+	sub, err := s.repository.UpdateSubscriber(ctx, id, request)
+	if err != nil {
+		return Subscriber{}, fmt.Errorf("update subscriber in repository: %w", err)
+	}
+
+	return sub, nil
+}
+
+func (s *Service) DeleteSubscriber(ctx goctx.Context, id int) (Subscriber, error) {
+	sub, err := s.repository.DeleteSubscriber(ctx, id)
+	if err != nil {
+		return Subscriber{}, fmt.Errorf("delete subscriber from repository: %w", err)
+	}
+
+	return sub, nil
+}

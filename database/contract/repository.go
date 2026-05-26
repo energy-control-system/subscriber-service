@@ -16,6 +16,9 @@ var (
 	//go:embed sql/add_contract.sql
 	addContractSQL string
 
+	//go:embed sql/delete_contract.sql
+	deleteContractSQL string
+
 	//go:embed sql/get_all_contracts.sql
 	getAllContractsSQL string
 
@@ -24,6 +27,9 @@ var (
 
 	//go:embed sql/get_last_contracts_by_object_ids.sql
 	getLastContractsByObjectIDsSQL string
+
+	//go:embed sql/update_contract.sql
+	updateContractSQL string
 
 	//go:embed sql/upsert_contract.sql
 	upsertContractSQL string
@@ -161,6 +167,59 @@ func (r *Repository) GetLastContractsByObjectIDs(ctx context.Context, objectIDs 
 	}
 
 	return contracts, nil
+}
+
+func (r *Repository) UpdateContract(ctx context.Context, id int, request contract.UpdateContractRequest) (contract.Contract, error) {
+	sub, err := r.subscriberRepository.GetSubscriberByID(ctx, request.SubscriberID)
+	if err != nil {
+		return contract.Contract{}, fmt.Errorf("get subscriber: %w", err)
+	}
+
+	obj, err := r.objectRepository.GetObjectByID(ctx, request.ObjectID)
+	if err != nil {
+		return contract.Contract{}, fmt.Errorf("get object: %w", err)
+	}
+
+	dbRequest, err := MapUpdateContractRequestToDB(id, request)
+	if err != nil {
+		return contract.Contract{}, fmt.Errorf("map contract: %w", err)
+	}
+
+	var dbContract Contract
+	err = db.NamedGetWithDB(ctx, r.db, &dbContract, updateContractSQL, dbRequest)
+	if err != nil {
+		return contract.Contract{}, fmt.Errorf("update contract: %w", err)
+	}
+
+	updatedContract := MapContractFromDB(dbContract)
+	updatedContract.Subscriber = sub
+	updatedContract.Object = obj
+
+	return updatedContract, nil
+}
+
+func (r *Repository) DeleteContract(ctx context.Context, id int) (contract.Contract, error) {
+	var dbContract Contract
+	err := r.db.GetContext(ctx, &dbContract, deleteContractSQL, id)
+	if err != nil {
+		return contract.Contract{}, fmt.Errorf("delete contract: %w", err)
+	}
+
+	sub, err := r.subscriberRepository.GetSubscriberByID(ctx, dbContract.SubscriberID)
+	if err != nil {
+		return contract.Contract{}, fmt.Errorf("get subscriber: %w", err)
+	}
+
+	obj, err := r.objectRepository.GetObjectByID(ctx, dbContract.ObjectID)
+	if err != nil {
+		return contract.Contract{}, fmt.Errorf("get object: %w", err)
+	}
+
+	deletedContract := MapContractFromDB(dbContract)
+	deletedContract.Subscriber = sub
+	deletedContract.Object = obj
+
+	return deletedContract, nil
 }
 
 func (r *Repository) UpsertContracts(ctx context.Context, contracts []contract.UpsertContractRequest) error {

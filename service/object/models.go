@@ -78,6 +78,11 @@ type UpsertObjectRequest struct {
 	HaveAutomaton bool   `json:"HaveAutomaton"`
 }
 
+type UpdateObjectRequest struct {
+	Address       string `json:"Address"`
+	HaveAutomaton bool   `json:"HaveAutomaton"`
+}
+
 type UpsertDeviceRequest struct {
 	ObjectAddress    string          `json:"ObjectAddress"`
 	Type             string          `json:"Type"`

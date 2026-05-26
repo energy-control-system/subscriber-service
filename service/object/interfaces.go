@@ -12,4 +12,6 @@ type Repository interface {
 	GetObjectByDeviceID(ctx context.Context, deviceID int) (Object, error)
 	GetObjectBySealID(ctx context.Context, sealID int) (Object, error)
 	GetAllObjects(ctx context.Context, page pagination.Pagination) ([]Object, error)
+	UpdateObject(ctx context.Context, id int, request UpdateObjectRequest) (Object, error)
+	DeleteObject(ctx context.Context, id int) (Object, error)
 }

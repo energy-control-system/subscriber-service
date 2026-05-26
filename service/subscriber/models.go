@@ -95,3 +95,23 @@ type UpsertSubscriberRequestPassport struct {
 	IssuedBy  string `json:"IssuedBy"`
 	IssueDate string `json:"IssueDate"`
 }
+
+type UpdateSubscriberRequest struct {
+	AccountNumber string                          `json:"AccountNumber"`
+	Surname       string                          `json:"Surname"`
+	Name          string                          `json:"Name"`
+	Patronymic    string                          `json:"Patronymic"`
+	PhoneNumber   string                          `json:"PhoneNumber"`
+	Email         string                          `json:"Email"`
+	INN           string                          `json:"INN"`
+	BirthDate     string                          `json:"BirthDate"`
+	Status        Status                          `json:"Status"`
+	Passport      UpdateSubscriberRequestPassport `json:"Passport"`
+}
+
+type UpdateSubscriberRequestPassport struct {
+	Series    string `json:"Series"`
+	Number    string `json:"Number"`
+	IssuedBy  string `json:"IssuedBy"`
+	IssueDate string `json:"IssueDate"`
+}

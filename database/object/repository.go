@@ -23,6 +23,9 @@ var (
 	//go:embed sql/add_seal.sql
 	addSealSQL string
 
+	//go:embed sql/delete_object.sql
+	deleteObjectSQL string
+
 	//go:embed sql/get_all_devices.sql
 	getAllDevicesSQL string
 
@@ -49,6 +52,9 @@ var (
 
 	//go:embed sql/upsert_device.sql
 	upsertDeviceSQL string
+
+	//go:embed sql/update_object.sql
+	updateObjectSQL string
 
 	//go:embed sql/upsert_object.sql
 	upsertObjectSQL string
@@ -356,6 +362,116 @@ func (r *Repository) GetAllObjects(ctx context.Context, page pagination.Paginati
 	}
 
 	return objects, err
+}
+
+func (r *Repository) UpdateObject(ctx context.Context, id int, request object.UpdateObjectRequest) (object.Object, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return object.Object{}, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	var dbObject Object
+	err = db.NamedGet(tx, &dbObject, updateObjectSQL, MapUpdateObjectRequestToDB(id, request))
+	if err != nil {
+		err = fmt.Errorf("update object: %w", err)
+		return object.Object{}, err
+	}
+
+	var dbDevices []Device
+	err = tx.SelectContext(ctx, &dbDevices, getObjectDevicesSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get object devices: %w", err)
+		return object.Object{}, err
+	}
+
+	var dbSeals []Seal
+	err = tx.SelectContext(ctx, &dbSeals, getObjectSealsSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get object seals: %w", err)
+		return object.Object{}, err
+	}
+
+	obj, err := MapObjectFullFromDB(dbObject, dbDevices, dbSeals)
+	if err != nil {
+		err = fmt.Errorf("map object: %w", err)
+		return object.Object{}, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return object.Object{}, err
+	}
+
+	return obj, nil
+}
+
+func (r *Repository) DeleteObject(ctx context.Context, id int) (object.Object, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return object.Object{}, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, fmt.Errorf("transaction rollback: %w", tx.Rollback()))
+		}
+	}()
+
+	var dbObject Object
+	err = tx.GetContext(ctx, &dbObject, getObjectByIDSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get object by id: %w", err)
+		return object.Object{}, err
+	}
+
+	var dbDevices []Device
+	err = tx.SelectContext(ctx, &dbDevices, getObjectDevicesSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get object devices: %w", err)
+		return object.Object{}, err
+	}
+
+	var dbSeals []Seal
+	err = tx.SelectContext(ctx, &dbSeals, getObjectSealsSQL, id)
+	if err != nil {
+		err = fmt.Errorf("get object seals: %w", err)
+		return object.Object{}, err
+	}
+
+	deletedObject, err := MapObjectFullFromDB(dbObject, dbDevices, dbSeals)
+	if err != nil {
+		err = fmt.Errorf("map object: %w", err)
+		return object.Object{}, err
+	}
+
+	result, err := tx.ExecContext(ctx, deleteObjectSQL, id)
+	if err != nil {
+		err = fmt.Errorf("delete object: %w", err)
+		return object.Object{}, err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		err = fmt.Errorf("get rows affected: %w", err)
+		return object.Object{}, err
+	}
+	if rows != 1 {
+		err = fmt.Errorf("rows affected = %d, expected 1", rows)
+		return object.Object{}, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("commit transaction: %w", err)
+		return object.Object{}, err
+	}
+
+	return deletedObject, nil
 }
 
 func (r *Repository) UpsertObjects(ctx context.Context, objects []object.UpsertObjectRequest) error {
