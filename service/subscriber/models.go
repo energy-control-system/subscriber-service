@@ -37,12 +37,7 @@ type ExtendedSubscriber struct {
 }
 
 type ListFilter struct {
-	Surname       string
-	Name          string
-	Patronymic    string
-	AccountNumber string
-	PhoneNumber   string
-	Address       string
+	Search string
 }
 
 type Contract struct {

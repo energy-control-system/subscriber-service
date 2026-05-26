@@ -242,12 +242,7 @@ func (r *Repository) GetAllSubscribers(ctx context.Context, page pagination.Pagi
 		ctx,
 		&dbSubscribers,
 		getAllSubscribersSQL,
-		filter.Surname,
-		filter.Name,
-		filter.Patronymic,
-		filter.AccountNumber,
-		filter.PhoneNumber,
-		filter.Address,
+		filter.Search,
 		page.LimitArg(),
 		page.Offset,
 	)
