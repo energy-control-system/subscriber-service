@@ -18,6 +18,7 @@ import (
 // @Success 200 {object} object.Object
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /objects [post]
 func AddObject(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -45,6 +46,7 @@ func AddObject(s *object.Service) gorouter.Handler {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /objects/{id} [get]
 func GetObjectByID(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -134,6 +136,7 @@ func GetObjectBySealID(s *object.Service) gorouter.Handler {
 // @Success 200 {array} object.Object
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /objects [get]
 func GetAllObjects(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -162,6 +165,7 @@ func GetAllObjects(s *object.Service) gorouter.Handler {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /objects/{id} [patch]
 func UpdateObject(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -194,6 +198,7 @@ func UpdateObject(s *object.Service) gorouter.Handler {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /objects/{id} [delete]
 func DeleteObject(s *object.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {

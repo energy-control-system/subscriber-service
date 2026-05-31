@@ -18,6 +18,7 @@ import (
 // @Success 200 {object} subscriber.Subscriber
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /subscribers [post]
 func AddSubscriber(s *subscriber.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -49,6 +50,7 @@ type idVars struct {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /subscribers/{id} [get]
 func GetSubscriberByID(s *subscriber.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -76,6 +78,7 @@ func GetSubscriberByID(s *subscriber.Service) gorouter.Handler {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /subscribers/{id}/extended [get]
 func GetSubscriberExtendedByID(s *subscriber.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -105,6 +108,7 @@ func GetSubscriberExtendedByID(s *subscriber.Service) gorouter.Handler {
 // @Success 200 {array} subscriber.Subscriber
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /subscribers [get]
 func GetAllSubscribers(s *subscriber.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -145,6 +149,7 @@ func GetAllSubscribers(s *subscriber.Service) gorouter.Handler {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /subscribers/{id} [patch]
 func UpdateSubscriber(s *subscriber.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -177,6 +182,7 @@ func UpdateSubscriber(s *subscriber.Service) gorouter.Handler {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /subscribers/{id} [delete]
 func DeleteSubscriber(s *subscriber.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {

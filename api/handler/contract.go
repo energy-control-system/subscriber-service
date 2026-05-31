@@ -18,6 +18,7 @@ import (
 // @Success 200 {object} contract.Contract
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /contracts [post]
 func AddContract(s *contract.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -45,6 +46,7 @@ func AddContract(s *contract.Service) gorouter.Handler {
 // @Success 200 {array} contract.Contract
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /contracts [get]
 func GetAllContracts(s *contract.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -134,6 +136,7 @@ func GetLastContractByObjectID(s *contract.Service) gorouter.Handler {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /contracts/{id} [patch]
 func UpdateContract(s *contract.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {
@@ -166,6 +169,7 @@ func UpdateContract(s *contract.Service) gorouter.Handler {
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 404 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /contracts/{id} [delete]
 func DeleteContract(s *contract.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {

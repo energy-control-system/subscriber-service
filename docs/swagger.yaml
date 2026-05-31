@@ -312,6 +312,12 @@ components:
         Series:
           type: string
       type: object
+  securitySchemes:
+    bearer:
+      description: JWT authorization header. Use Bearer <token>.
+      in: header
+      name: Authorization
+      type: apiKey
 externalDocs:
   description: ""
   url: ""
@@ -356,6 +362,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: List contracts
       tags:
       - contracts
@@ -389,6 +397,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Create contract
       tags:
       - contracts
@@ -427,6 +437,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Delete contract
       tags:
       - contracts
@@ -473,6 +485,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Update contract
       tags:
       - contracts
@@ -586,6 +600,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: List objects
       tags:
       - objects
@@ -619,6 +635,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Create metering object
       tags:
       - objects
@@ -657,6 +675,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Delete metering object
       tags:
       - objects
@@ -694,6 +714,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Get object by ID
       tags:
       - objects
@@ -740,6 +762,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Update metering object
       tags:
       - objects
@@ -849,6 +873,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Import registry
       tags:
       - registry
@@ -898,6 +924,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: List subscribers
       tags:
       - subscribers
@@ -931,6 +959,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Create subscriber
       tags:
       - subscribers
@@ -969,6 +999,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Delete subscriber
       tags:
       - subscribers
@@ -1006,6 +1038,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Get subscriber by ID
       tags:
       - subscribers
@@ -1052,6 +1086,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Update subscriber
       tags:
       - subscribers
@@ -1090,6 +1126,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/gorouter.ErrorResponse'
           description: Internal Server Error
+      security:
+      - bearer: []
       summary: Get subscriber with contracts and objects
       tags:
       - subscribers

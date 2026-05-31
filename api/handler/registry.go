@@ -17,6 +17,7 @@ import (
 // @Success 200
 // @Failure 400 {object} gorouter.ErrorResponse
 // @Failure 500 {object} gorouter.ErrorResponse
+// @Security bearer
 // @Router /registry/parse [post]
 func ParseRegistry(s *registry.Service) gorouter.Handler {
 	return func(c gorouter.Context) error {

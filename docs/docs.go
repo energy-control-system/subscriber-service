@@ -477,6 +477,14 @@ const docTemplate = `{
                 },
                 "type": "object"
             }
+        },
+        "securitySchemes": {
+            "bearer": {
+                "description": "JWT authorization header. Use Bearer \u003ctoken\u003e.",
+                "in": "header",
+                "name": "Authorization",
+                "type": "apiKey"
+            }
         }
     },
     "info": {
@@ -545,6 +553,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "List contracts",
                 "tags": [
                     "contracts"
@@ -597,6 +610,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Create contract",
                 "tags": [
                     "contracts"
@@ -780,6 +798,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Delete contract",
                 "tags": [
                     "contracts"
@@ -853,6 +876,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Update contract",
                 "tags": [
                     "contracts"
@@ -915,6 +943,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "List objects",
                 "tags": [
                     "objects"
@@ -967,6 +1000,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Create metering object",
                 "tags": [
                     "objects"
@@ -1153,6 +1191,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Delete metering object",
                 "tags": [
                     "objects"
@@ -1213,6 +1256,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Get object by ID",
                 "tags": [
                     "objects"
@@ -1286,6 +1334,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Update metering object",
                 "tags": [
                     "objects"
@@ -1337,6 +1390,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Import registry",
                 "tags": [
                     "registry"
@@ -1415,6 +1473,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "List subscribers",
                 "tags": [
                     "subscribers"
@@ -1467,6 +1530,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Create subscriber",
                 "tags": [
                     "subscribers"
@@ -1529,6 +1597,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Delete subscriber",
                 "tags": [
                     "subscribers"
@@ -1589,6 +1662,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Get subscriber by ID",
                 "tags": [
                     "subscribers"
@@ -1662,6 +1740,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Update subscriber",
                 "tags": [
                     "subscribers"
@@ -1724,6 +1807,11 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ],
                 "summary": "Get subscriber with contracts and objects",
                 "tags": [
                     "subscribers"
