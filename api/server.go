@@ -13,7 +13,6 @@ import (
 	"github.com/sunshineOfficial/golib/gohttp/gorouter"
 	"github.com/sunshineOfficial/golib/gohttp/gorouter/middleware"
 	"github.com/sunshineOfficial/golib/gohttp/gorouter/plugin"
-	"github.com/sunshineOfficial/golib/gohttp/gorouter/status"
 	"github.com/sunshineOfficial/golib/gohttp/goserver"
 	"github.com/sunshineOfficial/golib/golog"
 )
@@ -21,7 +20,6 @@ import (
 type ServerBuilder struct {
 	server goserver.Server
 	router *gorouter.Router
-	auth   gorouter.Middleware
 }
 
 func NewServerBuilder(ctx context.Context, log golog.Logger, settings config.Settings) *ServerBuilder {
@@ -32,7 +30,6 @@ func NewServerBuilder(ctx context.Context, log golog.Logger, settings config.Set
 			middleware.Recover,
 			middleware.LogError,
 		),
-		auth: middleware.IsAnyAuthorized(status.UnauthorizedHandler),
 	}
 }
 
@@ -42,38 +39,38 @@ func (s *ServerBuilder) AddDebug() {
 
 func (s *ServerBuilder) AddSubscribers(service *subscriber.Service) {
 	r := s.router.SubRouter("/subscribers")
-	r.HandlePost("", handler.AddSubscriber(service)).Use(s.auth)
-	r.HandleGet("/{id}/extended", handler.GetSubscriberExtendedByID(service)).Use(s.auth)
-	r.HandleGet("/{id}", handler.GetSubscriberByID(service)).Use(s.auth)
-	r.HandlePatch("/{id}", handler.UpdateSubscriber(service)).Use(s.auth)
-	r.HandleDelete("/{id}", handler.DeleteSubscriber(service)).Use(s.auth)
-	r.HandleGet("", handler.GetAllSubscribers(service)).Use(s.auth)
+	r.HandlePost("", handler.AddSubscriber(service))
+	r.HandleGet("/{id}/extended", handler.GetSubscriberExtendedByID(service))
+	r.HandleGet("/{id}", handler.GetSubscriberByID(service))
+	r.HandlePatch("/{id}", handler.UpdateSubscriber(service))
+	r.HandleDelete("/{id}", handler.DeleteSubscriber(service))
+	r.HandleGet("", handler.GetAllSubscribers(service))
 }
 
 func (s *ServerBuilder) AddObjects(service *object.Service) {
 	r := s.router.SubRouter("/objects")
-	r.HandlePost("", handler.AddObject(service)).Use(s.auth)
-	r.HandleGet("/{id}", handler.GetObjectByID(service)).Use(s.auth)
-	r.HandlePatch("/{id}", handler.UpdateObject(service)).Use(s.auth)
-	r.HandleDelete("/{id}", handler.DeleteObject(service)).Use(s.auth)
+	r.HandlePost("", handler.AddObject(service))
+	r.HandleGet("/{id}", handler.GetObjectByID(service))
+	r.HandlePatch("/{id}", handler.UpdateObject(service))
+	r.HandleDelete("/{id}", handler.DeleteObject(service))
 	r.HandleGet("/devices/{deviceID}", handler.GetObjectByDeviceID(service))
 	r.HandleGet("/seals/{sealID}", handler.GetObjectBySealID(service))
-	r.HandleGet("", handler.GetAllObjects(service)).Use(s.auth)
+	r.HandleGet("", handler.GetAllObjects(service))
 }
 
 func (s *ServerBuilder) AddContracts(service *contract.Service) {
 	r := s.router.SubRouter("/contracts")
-	r.HandlePost("", handler.AddContract(service)).Use(s.auth)
-	r.HandleGet("", handler.GetAllContracts(service)).Use(s.auth)
-	r.HandlePatch("/{id}", handler.UpdateContract(service)).Use(s.auth)
-	r.HandleDelete("/{id}", handler.DeleteContract(service)).Use(s.auth)
+	r.HandlePost("", handler.AddContract(service))
+	r.HandleGet("", handler.GetAllContracts(service))
+	r.HandlePatch("/{id}", handler.UpdateContract(service))
+	r.HandleDelete("/{id}", handler.DeleteContract(service))
 	r.HandleGet("/objects/last", handler.GetLastContractsByObjectIDs(service))
 	r.HandleGet("/objects/{objectID}/last", handler.GetLastContractByObjectID(service))
 }
 
 func (s *ServerBuilder) AddRegistry(service *registry.Service) {
 	r := s.router.SubRouter("/registry")
-	r.HandlePost("/parse", handler.ParseRegistry(service)).Use(s.auth)
+	r.HandlePost("/parse", handler.ParseRegistry(service))
 }
 
 func (s *ServerBuilder) Build() goserver.Server {

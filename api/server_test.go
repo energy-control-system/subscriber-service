@@ -9,32 +9,51 @@ import (
 	"github.com/sunshineOfficial/golib/golog"
 )
 
-func TestSubscriberAuthorizationPolicy(t *testing.T) {
+func TestSubscriberRoutesAllowUnauthenticatedRequests(t *testing.T) {
 	builder := NewServerBuilder(t.Context(), golog.NewLogger("test"), config.Settings{
 		Port: 80,
 	})
 	builder.AddSubscribers(nil)
+	builder.AddObjects(nil)
 	builder.AddContracts(nil)
+	builder.AddRegistry(nil)
 
-	t.Run("subscriber creation requires authorization", func(t *testing.T) {
-		response := httptest.NewRecorder()
-		request := httptest.NewRequest(http.MethodPost, "/subscribers", nil)
+	routes := []struct {
+		method string
+		path   string
+	}{
+		{method: http.MethodPost, path: "/subscribers"},
+		{method: http.MethodGet, path: "/subscribers/1/extended"},
+		{method: http.MethodGet, path: "/subscribers/1"},
+		{method: http.MethodPatch, path: "/subscribers/1"},
+		{method: http.MethodDelete, path: "/subscribers/1"},
+		{method: http.MethodGet, path: "/subscribers"},
+		{method: http.MethodPost, path: "/objects"},
+		{method: http.MethodGet, path: "/objects/1"},
+		{method: http.MethodPatch, path: "/objects/1"},
+		{method: http.MethodDelete, path: "/objects/1"},
+		{method: http.MethodGet, path: "/objects/devices/1"},
+		{method: http.MethodGet, path: "/objects/seals/1"},
+		{method: http.MethodGet, path: "/objects"},
+		{method: http.MethodPost, path: "/contracts"},
+		{method: http.MethodGet, path: "/contracts"},
+		{method: http.MethodPatch, path: "/contracts/1"},
+		{method: http.MethodDelete, path: "/contracts/1"},
+		{method: http.MethodGet, path: "/contracts/objects/last?id=1"},
+		{method: http.MethodGet, path: "/contracts/objects/1/last"},
+		{method: http.MethodPost, path: "/registry/parse"},
+	}
 
-		builder.router.ServeHTTP(response, request)
+	for _, route := range routes {
+		t.Run(route.method+" "+route.path, func(t *testing.T) {
+			response := httptest.NewRecorder()
+			request := httptest.NewRequest(route.method, route.path, nil)
 
-		if response.Code != http.StatusUnauthorized {
-			t.Fatalf("status = %d, want %d", response.Code, http.StatusUnauthorized)
-		}
-	})
+			builder.router.ServeHTTP(response, request)
 
-	t.Run("last contract by object id allows internal calls without authorization", func(t *testing.T) {
-		response := httptest.NewRecorder()
-		request := httptest.NewRequest(http.MethodGet, "/contracts/objects/1/last", nil)
-
-		builder.router.ServeHTTP(response, request)
-
-		if response.Code == http.StatusUnauthorized {
-			t.Fatalf("status = %d, route must stay open for internal service calls", response.Code)
-		}
-	})
+			if response.Code == http.StatusUnauthorized {
+				t.Fatalf("status = %d, route must be open without authorization", response.Code)
+			}
+		})
+	}
 }

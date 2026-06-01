@@ -470,14 +470,6 @@
                 },
                 "type": "object"
             }
-        },
-        "securitySchemes": {
-            "bearer": {
-                "description": "JWT authorization header. Use Bearer \u003ctoken\u003e.",
-                "in": "header",
-                "name": "Authorization",
-                "type": "apiKey"
-            }
         }
     },
     "info": {
@@ -546,11 +538,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "List contracts",
                 "tags": [
                     "contracts"
@@ -603,11 +590,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Create contract",
                 "tags": [
                     "contracts"
@@ -791,11 +773,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Delete contract",
                 "tags": [
                     "contracts"
@@ -869,11 +846,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Update contract",
                 "tags": [
                     "contracts"
@@ -936,11 +908,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "List objects",
                 "tags": [
                     "objects"
@@ -993,11 +960,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Create metering object",
                 "tags": [
                     "objects"
@@ -1184,11 +1146,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Delete metering object",
                 "tags": [
                     "objects"
@@ -1249,11 +1206,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Get object by ID",
                 "tags": [
                     "objects"
@@ -1327,11 +1279,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Update metering object",
                 "tags": [
                     "objects"
@@ -1383,11 +1330,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Import registry",
                 "tags": [
                     "registry"
@@ -1466,11 +1408,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "List subscribers",
                 "tags": [
                     "subscribers"
@@ -1523,11 +1460,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Create subscriber",
                 "tags": [
                     "subscribers"
@@ -1590,11 +1522,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Delete subscriber",
                 "tags": [
                     "subscribers"
@@ -1655,11 +1582,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Get subscriber by ID",
                 "tags": [
                     "subscribers"
@@ -1733,11 +1655,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Update subscriber",
                 "tags": [
                     "subscribers"
@@ -1800,11 +1717,6 @@
                         "description": "Internal Server Error"
                     }
                 },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ],
                 "summary": "Get subscriber with contracts and objects",
                 "tags": [
                     "subscribers"
